@@ -1,0 +1,969 @@
+{% extends "base.html" %}
+
+{% block title %}Download Processed File | {{ tool_name }} | PDFMaster Pro{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --success-color: #1cc88a;
+        --danger-color: #e74a3b;
+        --warning-color: #f6c23e;
+        --info-color: #36b9cc;
+        --dark-color: #5a5c69;
+    }
+    
+    .download-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+        margin-top: 1rem;
+    }
+    
+    .success-icon {
+        font-size: 3rem;
+        color: var(--success-color);
+        margin-bottom: 1rem;
+        animation: bounceIn 1s ease;
+    }
+    
+    @keyframes bounceIn {
+        0% { transform: scale(0.8); opacity: 0; }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .file-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-left: 3px solid var(--primary-color);
+        transition: all 0.2s ease;
+    }
+    
+    .file-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .file-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: none;
+    }
+    
+    .btn-download {
+        background: linear-gradient(135deg, var(--primary-color), #2e59d9);
+        color: white;
+    }
+    
+    .btn-download:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-rename {
+        background: linear-gradient(135deg, var(--info-color), #2c9faf);
+        color: white;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, var(--danger-color), #be2617);
+        color: white;
+    }
+    
+    .file-size-badge {
+        background: linear-gradient(135deg, #e8f0fe, #d2e3fc);
+        color: var(--primary-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .countdown-timer {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--danger-color);
+        background: rgba(231, 74, 59, 0.1);
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    .cleanup-section {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Centered Toast Notification */
+    .toast-center-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 90%;
+        text-align: center;
+    }
+    
+    .toast-center {
+        animation: fadeIn 0.3s ease;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-color), #2e59d9);
+        color: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem;
+        border: none;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .countdown-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--danger-color);
+        text-align: center;
+        margin: 0.75rem 0;
+    }
+    
+    .btn-gradient {
+        background: linear-gradient(135deg, var(--primary-color), #2e59d9);
+        border: none;
+        border-radius: 6px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-gradient:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-gradient-danger {
+        background: linear-gradient(135deg, var(--danger-color), #be2617);
+    }
+    
+    .btn-gradient-warning {
+        background: linear-gradient(135deg, var(--warning-color), #dda20a);
+    }
+    
+    .file-meta {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .no-files-placeholder {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+    
+    .no-files-placeholder i {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Scrollable File Area */
+    .files-container {
+        max-height: 50vh;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        padding-right: 0.5rem;
+    }
+    
+    .files-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .files-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .files-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .files-container::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+    
+    /* Modal backdrop fix */
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+    
+    @media (max-width: 768px) {
+        .download-container {
+            padding: 1rem;
+            margin: 0.5rem;
+        }
+        
+        .file-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .cleanup-section .row > div {
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        
+        .cleanup-section .text-md-end {
+            text-align: center !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Centered Toast Notifications -->
+    <div id="toast-container" class="toast-center-container"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this file?</p>
+                    <p class="text-muted" id="delete-file-name"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Server Data Confirmation Modal -->
+    <div class="modal fade" id="clearServerDataModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Clear Server Data</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to clear all server data?</p>
+                    <p class="text-muted">This action cannot be undone. All your files (uploads, previews, and processed files) will be permanently deleted.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" id="cancelClearServerBtn">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmClearServerBtn">
+                        <i class="fas fa-trash me-1"></i>Yes, Clear Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Processed Files Confirmation Modal -->
+    <div class="modal fade" id="clearProcessedFilesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Clear Processed Files</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to clear all processed files?</p>
+                    <p class="text-muted">This action will remove only processed files. Your uploads and previews will remain.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" id="cancelClearProcessedBtn">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmClearProcessedBtn">
+                        <i class="fas fa-trash me-1"></i>Yes, Clear Processed Files
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename File Modal -->
+    <div class="modal fade" id="renameModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Rename File</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-2">Enter a new name for your file:</p>
+                    <input type="text" id="rename-input" class="form-control" placeholder="Enter new filename">
+                    <div class="form-text">File will be saved with its original extension (e.g., .pdf, .zip)</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmRenameBtn">
+                        <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="download-container">
+        <div class="text-center mb-4">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="fw-bold mb-2" style="font-size: 1.75rem;">Processing Complete</h1>
+            <p class="text-muted">{{ message }}</p>
+        </div>
+
+        <!-- Countdown section - ALWAYS VISIBLE if countdown is active -->
+        <div class="cleanup-section" id="countdown-section" style="display: none;">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-1" style="font-size: 1rem;"><i class="fas fa-clock text-warning me-1"></i>Automatic Cleanup</h5>
+                    <p class="mb-0">All Files will be automatically removed in: 
+                       <span class="countdown-timer" id="countdown-timer"></span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-gradient-danger" id="cleanup-all-btn">
+                        <i class="fas fa-broom me-1"></i>Clear Server Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if files %}
+        <div class="mb-4">
+            <h3 class="text-center mb-3 fw-bold" style="font-size: 1.3rem;">Your Processed Files</h3>
+            
+            <!-- Download All as ZIP Button -->
+            {% if files|length > 1 %}
+            <div class="text-center mb-3">
+                <button class="btn btn-gradient" id="download-all-btn">
+                    <i class="fas fa-file-archive me-1"></i>Download All as ZIP
+                </button>
+            </div>
+            {% endif %}
+            
+            <div class="files-container">
+                {% for file in files %}
+                <div class="file-card" id="file-{{ file.name | replace('.', '_') }}">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="file-name mb-1" style="font-size: 1rem;" id="display-name-{{ file.name | replace('.', '_') }}">
+                                <i class="fas fa-file-pdf text-danger me-1"></i>{{ file.display_name }}
+                            </h5>
+                            <div class="file-meta">
+                                <span class="file-size-badge">{{ file.size }}</span>
+                                <span class="ms-2"><i class="fas fa-tools me-1"></i>{{ file.tool_used }}</span>
+                            </div>
+                            <div class="file-meta mt-1">
+                                <i class="fas fa-clock me-1"></i> Processed: {{ file.processed_time }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="file-actions">
+                                <a href="{{ file.download_url }}" class="btn btn-download download-btn" download="{{ file.display_name }}">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                                <button class="btn btn-rename rename-file-btn" 
+                                        data-filename="{{ file.name }}" 
+                                        data-displayname="{{ file.display_name }}">
+                                    <i class="fas fa-edit me-1"></i>Rename
+                                </button>
+                                <button class="btn btn-delete delete-file-btn" 
+                                        data-filename="{{ file.name }}" 
+                                        data-displayname="{{ file.display_name }}">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="no-files-placeholder" id="no-files-placeholder">
+            <i class="fas fa-inbox"></i>
+            <h4 class="text-muted" style="font-size: 1.1rem;">No Processed Files</h4>
+            <p class="text-muted">Your processed files will appear here</p>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <div class="button-container d-flex flex-wrap justify-content-center gap-2">
+                {% if tool_id %}
+                <a href="{{ url_for('tool_page', tool_id=tool_id) }}" class="btn btn-gradient">
+                    <i class="fas fa-arrow-left me-1"></i>Back to {{ tool_name }}
+                </a>
+                {% endif %}
+                <a href="{{ url_for('home') }}#tools" class="btn btn-outline-primary">
+                    <i class="fas fa-th-large me-1"></i>All Tools
+                </a>
+                {% if files %}
+                <button class="btn btn-gradient-warning" id="cleanup-processed-btn">
+                    <i class="fas fa-trash me-1"></i>Clear Processed Files
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <div class="text-muted small">
+                <i class="fas fa-clock me-1"></i> Current Time: <span id="current-time"></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap components
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
+    const clearServerDataModal = new bootstrap.Modal(document.getElementById('clearServerDataModal'));
+    const clearProcessedFilesModal = new bootstrap.Modal(document.getElementById('clearProcessedFilesModal'));
+
+    let countdownInterval;
+    let remainingSeconds = {{ remaining_time | default(0) }}; // Initial value from Flask context
+
+    const countdownSection = document.getElementById('countdown-section');
+    const countdownTimerElement = document.getElementById('countdown-timer');
+    const noFilesPlaceholder = document.getElementById('no-files-placeholder');
+    const filesContainer = document.querySelector('.files-container');
+
+    // Update current time display
+    function updateTime() {
+        const now = new Date();
+        const currentTimeElement = document.getElementById('current-time');
+        if (currentTimeElement) {
+            currentTimeElement.textContent = now.toLocaleString();
+        }
+    }
+    updateTime(); // Initial call
+    setInterval(updateTime, 1000); // Update every second
+
+    // Function to start or resume the countdown timer
+    function startCountdown() {
+        clearInterval(countdownInterval); // Clear any existing interval
+
+        // Ensure countdown section is visible when countdown starts
+        if (countdownSection) {
+            countdownSection.style.display = 'block';
+        }
+
+        // Function to update the countdown display
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = Math.floor(remainingSeconds % 60);
+            const displayText = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+
+            if (countdownTimerElement) {
+                countdownTimerElement.textContent = displayText;
+            }
+
+            if (remainingSeconds <= 0) {
+                clearInterval(countdownInterval); // Stop the countdown
+                if (countdownSection) {
+                    countdownSection.style.display = 'none'; // Hide countdown if it expires
+                }
+                // Trigger auto cleanup when countdown reaches zero
+                triggerCleanup('all'); // This will reload the page
+            } else {
+                remainingSeconds--; // Decrement remaining time
+            }
+        }
+
+        updateCountdownDisplay(); // Initial update immediately
+        countdownInterval = setInterval(updateCountdownDisplay, 1000); // Set interval for updates
+    }
+
+    // Fetch initial countdown status from backend
+    fetch('/countdown/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.active) {
+                remainingSeconds = data.remaining_time;
+                if (remainingSeconds > 0) {
+                    startCountdown();
+                } else {
+                    if (countdownSection) countdownSection.style.display = 'none';
+                }
+            } else {
+                if (countdownSection) countdownSection.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching countdown status:', error);
+            if (countdownSection) countdownSection.style.display = 'none';
+        });
+
+    // Event listener for "Download All as ZIP" button
+    const downloadAllBtn = document.getElementById('download-all-btn');
+    if (downloadAllBtn) {
+        downloadAllBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            // Store the response object to access headers later
+            let zipResponse; 
+
+            fetch('/download-all-zip', {
+                method: 'POST', // Use POST as defined in app.py
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                zipResponse = response; // Store the response object
+                if (!response.ok) {
+                    // If the server returns an error JSON, parse it
+                    return response.json().then(err => { throw new Error(err.message || 'Failed to download ZIP'); });
+                }
+                // If successful, response is a blob (the ZIP file)
+                return response.blob();
+            })
+            .then(blob => {
+                // Extract filename from Content-Disposition header if available
+                const contentDisposition = zipResponse.headers.get('Content-Disposition');
+                let filename = 'processed_files.zip';
+                if (contentDisposition && contentDisposition.indexOf('attachment') !== -1) {
+                    const filenameMatch = contentDisposition.match(/filename\*?=['"]?(?:UTF-\d['"]*)?([^;\n]*?)['"]?$/i);
+                    if (filenameMatch && filenameMatch[1]) {
+                        filename = decodeURIComponent(filenameMatch[1].replace(/^UTF-8''/, ''));
+                    }
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename; // Use extracted filename
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showToast('All files downloaded as ZIP', 'success');
+            })
+            .catch(error => {
+                console.error('Error downloading ZIP:', error);
+                showToast(error.message || 'Failed to download files as ZIP', 'error');
+            });
+        });
+    }
+
+    // Event listener for "Clear Processed Files" button (shows confirmation modal)
+    const cleanupProcessedBtn = document.getElementById('cleanup-processed-btn');
+    if (cleanupProcessedBtn) {
+        cleanupProcessedBtn.addEventListener('click', function() {
+            clearProcessedFilesModal.show();
+        });
+    }
+
+    // Event listener for confirming "Clear Processed Files"
+    const confirmClearProcessedBtn = document.getElementById('confirmClearProcessedBtn');
+    if (confirmClearProcessedBtn) {
+        confirmClearProcessedBtn.addEventListener('click', function() {
+            clearProcessedFilesModal.hide();
+            removeModalBackdrop(); // Ensure backdrop is removed
+            triggerCleanup('processed'); // Call cleanup function for processed files
+        });
+    }
+
+    // Event listener for canceling "Clear Processed Files"
+    const cancelClearProcessedBtn = document.getElementById('cancelClearProcessedBtn');
+    if (cancelClearProcessedBtn) {
+        cancelClearProcessedBtn.addEventListener('click', function() {
+            clearProcessedFilesModal.hide();
+            removeModalBackdrop(); // Ensure backdrop is removed
+        });
+    }
+
+    // Event listener for "Clear Server Data" button (shows confirmation modal)
+    const cleanupAllBtn = document.getElementById('cleanup-all-btn');
+    if (cleanupAllBtn) {
+        cleanupAllBtn.addEventListener('click', function() {
+            clearServerDataModal.show();
+        });
+    }
+
+    // Event listener for confirming "Clear Server Data"
+    const confirmClearServerBtn = document.getElementById('confirmClearServerBtn');
+    if (confirmClearServerBtn) {
+        confirmClearServerBtn.addEventListener('click', function() {
+            // Hide the modal and remove any backdrop
+            clearServerDataModal.hide();
+            removeModalBackdrop();
+
+            // Immediately hide the countdown section and stop the interval on client-side
+            if (countdownSection) {
+                countdownSection.style.display = 'none';
+            }
+            clearInterval(countdownInterval);
+
+            // Trigger the cleanup API call
+            triggerCleanup('all');
+        });
+    }
+
+    // Event listener for canceling "Clear Server Data"
+    const cancelClearServerBtn = document.getElementById('cancelClearServerBtn');
+    if (cancelClearServerBtn) {
+        cancelClearServerBtn.addEventListener('click', function() {
+            clearServerDataModal.hide();
+            removeModalBackdrop();
+        });
+    }
+
+    // Rename modal functionality
+    let currentRenameFile = null; // Variable to store the file being renamed
+
+    // Attach event listeners to all "Rename" buttons
+    document.querySelectorAll('.rename-file-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const filename = this.getAttribute('data-filename'); // Stored name
+            const displayName = this.getAttribute('data-displayname'); // Display name
+            currentRenameFile = { filename, displayName }; // Store file info
+
+            const renameInput = document.getElementById('rename-input');
+            if (renameInput) {
+                // Pre-fill input with display name, removing extension for user convenience
+                const nameWithoutExt = displayName.includes('.') ? displayName.substring(0, displayName.lastIndexOf('.')) : displayName;
+                renameInput.value = nameWithoutExt;
+            }
+            renameModal.show(); // Show the rename modal
+        });
+    });
+
+    // Event listener for confirming file rename
+    const confirmRenameBtn = document.getElementById('confirmRenameBtn');
+    if (confirmRenameBtn) {
+        confirmRenameBtn.addEventListener('click', function() {
+            const newNameRaw = document.getElementById('rename-input').value.trim();
+            if (!newNameRaw) {
+                showToast('Please enter a filename', 'error');
+                return;
+            }
+
+            if (currentRenameFile) {
+                renameFile(currentRenameFile.filename, newNameRaw); // Call rename API with stored name and raw new name
+            }
+            renameModal.hide(); // Hide the modal
+            removeModalBackdrop(); // Ensure backdrop is removed
+        });
+    }
+
+    // Attach event listeners to all "Delete" buttons
+    document.querySelectorAll('.delete-file-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const filename = this.getAttribute('data-filename'); // Stored name
+            const displayName = this.getAttribute('data-displayname'); // Display name
+
+            const deleteFileNameElement = document.getElementById('delete-file-name');
+            if (deleteFileNameElement) {
+                deleteFileNameElement.textContent = displayName; // Display file name in modal
+            }
+
+            // Set up the confirm button's action dynamically
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.onclick = function() {
+                    deleteSingleFile(filename, button); // Call delete API with stored name
+                    deleteModal.hide(); // Hide the modal
+                    removeModalBackdrop(); // Ensure backdrop is removed
+                };
+            }
+
+            deleteModal.show(); // Show the delete confirmation modal
+        });
+    });
+
+    // Helper function to remove Bootstrap modal backdrops
+    function removeModalBackdrop() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => {
+            backdrop.remove();
+        });
+
+        // Also ensure body classes are reset to prevent scroll issues
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+
+    /**
+     * Triggers a cleanup operation on the server.
+     * @param {string} type - The type of cleanup: 'all' or 'processed'.
+     */
+    function triggerCleanup(type) {
+        fetch('/cleanup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ type: type })
+        })
+        .then(response => {
+            if (!response.ok) {
+                // If the server returns an error JSON, parse it
+                return response.json().then(err => { throw new Error(err.message || 'Failed to perform cleanup'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                showToast(data.message, 'success');
+                // Force a complete page refresh after a short delay to ensure UI is updated
+                setTimeout(() => {
+                    window.location.reload(true); // true forces reload from server, not cache
+                }, 500); // Shorter delay for better UX
+            } else {
+                showToast(data.message || 'An error occurred during cleanup', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error during cleanup:', error);
+            showToast(error.message || 'An error occurred during cleanup', 'error');
+        });
+    }
+
+    /**
+     * Deletes a single file from the server.
+     * @param {string} filename - The name of the file to delete (stored name).
+     * @param {HTMLElement} buttonElement - The button element that triggered the delete (for UI update).
+     */
+    function deleteSingleFile(filename, buttonElement) {
+        fetch(`/cleanup/file/${encodeURIComponent(filename)}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Failed to delete file'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                const fileItem = buttonElement.closest('.file-card');
+                if (fileItem) {
+                    fileItem.style.opacity = '0'; // Fade out effect
+                    setTimeout(() => {
+                        fileItem.remove();
+                        // Check if all files are deleted and show placeholder if so
+                        const remainingFiles = document.querySelectorAll('.file-card').length;
+                        if (remainingFiles === 0) {
+                            if (noFilesPlaceholder) noFilesPlaceholder.style.display = 'block';
+                            if (filesContainer) filesContainer.style.display = 'none'; // Hide container if empty
+                            // Also hide the "Clear Processed Files" button if no files
+                            const cleanupProcessedBtn = document.getElementById('cleanup-processed-btn');
+                            if (cleanupProcessedBtn) cleanupProcessedBtn.style.display = 'none';
+                            // If no files, and countdown is active, it means only processed files were cleared.
+                            // The countdown should still be visible if it's for the session.
+                            // No change needed for countdown visibility here, as it's session-wide.
+                        }
+                    }, 500); // Remove after fade
+                }
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message || 'An error occurred while deleting the file', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting file:', error);
+            showToast(error.message || 'An error occurred while deleting the file', 'error');
+        });
+    }
+
+    /**
+     * Renames a file on the server.
+     * @param {string} filename - The current stored name of the file.
+     * @param {string} newNameRaw - The new desired name for the file (without extension, as entered by user).
+     */
+    function renameFile(filename, newNameRaw) {
+        fetch(`/rename/file/${encodeURIComponent(filename)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ new_name: newNameRaw }) // Send raw new name
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Failed to rename file'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the displayed name and download link in the UI
+                const fileCard = document.getElementById(`file-${filename.replace('.', '_')}`);
+                if (fileCard) {
+                    const displayNameElement = fileCard.querySelector('.file-name');
+                    const downloadButton = fileCard.querySelector('.download-btn');
+                    const renameBtn = fileCard.querySelector('.rename-file-btn');
+                    const deleteBtn = fileCard.querySelector('.delete-file-btn');
+
+                    if (displayNameElement) {
+                        // Update text content with the new display name from server
+                        displayNameElement.innerHTML = `<i class="fas fa-file-pdf text-danger me-1"></i>${data.new_display_name}`;
+                    }
+
+                    if (downloadButton) {
+                        downloadButton.setAttribute('download', data.new_display_name); // Update download attribute
+                        downloadButton.setAttribute('href', data.new_download_url); // Update download URL
+                    }
+
+                    // Update the data-filename and data-displayname attributes for the rename/delete buttons
+                    // so subsequent actions on the same file use the new stored name and display name
+                    if (renameBtn) {
+                        renameBtn.setAttribute('data-filename', data.new_name); // Use new stored name
+                        renameBtn.setAttribute('data-displayname', data.new_display_name); // Use new display name
+                    }
+                    if (deleteBtn) {
+                        deleteBtn.setAttribute('data-filename', data.new_name);
+                        deleteBtn.setAttribute('data-displayname', data.new_display_name);
+                    }
+                    // Also update the ID of the file card itself to match the new stored name
+                    fileCard.id = `file-${data.new_name.replace('.', '_')}`;
+                }
+
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message || 'An error occurred while renaming the file', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error renaming file:', error);
+            showToast(error.message || 'An error occurred while renaming the file', 'error');
+        });
+    }
+
+    /**
+     * Displays a toast notification.
+     * @param {string} message - The message to display.
+     * @param {'success'|'error'|'warning'} type - The type of toast (determines color and icon).
+     */
+    function showToast(message, type) {
+        const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            console.error('Toast container not found!');
+            return;
+        }
+
+        // Clear any existing toasts to ensure only one is visible at a time
+        toastContainer.innerHTML = '';
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-center align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'warning'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        const toastContent = document.createElement('div');
+        toastContent.className = 'd-flex';
+
+        const toastBody = document.createElement('div');
+        toastBody.className = 'toast-body d-flex align-items-center';
+
+        // Add icon based on type
+        const icon = document.createElement('i');
+        icon.className = type === 'success' ? 'fas fa-check-circle me-2' : 
+                         type === 'error' ? 'fas fa-exclamation-circle me-2' : 
+                         'fas fa-exclamation-triangle me-2';
+        toastBody.appendChild(icon);
+
+        // Add message text
+        const messageText = document.createElement('span');
+        messageText.textContent = message;
+        toastBody.appendChild(messageText);
+
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close btn-close-white ms-auto';
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+
+        toastContent.appendChild(toastBody);
+        toastContent.appendChild(closeButton);
+        toast.appendChild(toastContent);
+        toastContainer.appendChild(toast);
+
+        // Initialize and show the toast
+        const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+        bsToast.show();
+
+        // Remove the toast from DOM after it's hidden
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    }
+});
+</script>
+{% endblock %}
