@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us | PDFMaster Pro{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <h1 class="fw-bold mb-4">
+      <i class="fa-solid fa-envelope me-2 text-primary"></i> Contact Us
+    </h1>
+    <p class="text-muted mb-5">
+      Have questions, feedback, or need help? Fill out the form below or reach us directly via email and social media.
+    </p>
+
+    <div class="row gy-4">
+      <!-- Contact Form --> 
+      <div class="col-md-7">
+        <div class="p-4 bg-white shadow-sm rounded">
+          <h4 class="fw-bold mb-3"><i class="fa-solid fa-paper-plane me-2 text-success"></i> Send a Message</h4>
+          <form method="POST" action="/contact">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Name</label>
+              <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Email</label>
+              <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Message</label>
+              <textarea class="form-control" name="message" rows="5" placeholder="Your Message" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fa-solid fa-paper-plane me-1"></i> Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="col-md-5">
+        <div class="p-4 bg-white shadow-sm rounded h-100">
+          <h4 class="fw-bold mb-3"><i class="fa-solid fa-circle-info me-2 text-warning"></i> Contact Information</h4>
+          <ul class="list-unstyled text-muted">
+            <li class="mb-3">
+              <i class="fa-solid fa-envelope me-2 text-danger"></i> support@pdfmasterpro.com
+            </li>
+            <li class="mb-3">
+              <i class="fa-solid fa-phone me-2 text-success"></i> Not Available
+            </li>
+            <li class="mb-3">
+              <i class="fa-solid fa-location-dot me-2 text-primary"></i> Mumbai, India
+            </li>
+          </ul>
+
+          <div class="mt-4">
+            <h6 class="fw-bold">Follow Us</h6>
+            <div class="d-flex gap-3 fs-5">
+              <a href="#" class="text-dark"><i class="fa-brands fa-facebook"></i></a>
+              <a href="#" class="text-dark"><i class="fa-brands fa-twitter"></i></a>
+              <a href="#" class="text-dark"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="#" class="text-dark"><i class="fa-brands fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

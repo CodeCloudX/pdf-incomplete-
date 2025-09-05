@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block title %}Professional PDF Tools Suite | PDFMaster{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary py-5">
+    <div class="container py-5">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">Advanced PDF Tools for Professionals</h1>
+                <p class="lead text-white mb-4">Streamline your document workflow with our comprehensive suite of enterprise-grade PDF tools. Process, convert, and manage documents with unmatched precision.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="#tools" class="btn btn-light btn-lg rounded-pill px-4">Explore Tools</a>
+                    <a href="#enterprise" class="btn btn-outline-light btn-lg rounded-pill px-4">Enterprise Solutions</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-graphic bg-white bg-opacity-25 rounded-3 p-4 position-relative">
+                    <div class="floating-pdf">
+                        <i class="fas fa-file-pdf text-primary position-absolute" style="font-size: 4rem; top: 20px; left: 30px;"></i>
+                    </div>
+                    <div class="floating-word">
+                        <i class="fas fa-file-word text-info position-absolute" style="font-size: 3.5rem; top: 80px; right: 40px;"></i>
+                    </div>
+                    <div class="floating-excel">
+                        <i class="fas fa-file-excel text-success position-absolute" style="font-size: 3rem; bottom: 30px; left: 40px;"></i>
+                    </div>
+                    <div class="floating-image">
+                        <i class="fas fa-file-image text-warning position-absolute" style="font-size: 3.2rem; bottom: 80px; right: 30px;"></i>
+                    </div>
+                    <div class="main-icon">
+                        <i class="fas fa-cogs text-white opacity-75" style="font-size: 5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="tools-section" class="py-5 bg-light">
+    <!-- Tools content -->
+</section>
+
+
+<!-- Tools Grid Section -->
+<section id="tools" class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">Comprehensive PDF Tool Suite</h2>
+                <p class="text-muted fs-5">Professional-grade solutions for all your document needs</p>
+                <div class="mx-auto" style="max-width: 600px;">
+                    <div class="input-group mb-3 mt-4 shadow-sm">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control form-control-lg border-start-0" placeholder="Search tools..." id="toolSearch" aria-label="Search tools">
+                        <button class="btn btn-primary px-4" type="button" id="searchButton">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" id="toolsContainer">
+            <!-- Split PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/split' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-split">
+                                <i class="fa-solid fa-scissors fa-lg tool-icon icon-split"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Split PDF</h5>
+                            <p class="text-muted small flex-grow-1">Split your PDFs into single pages</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Merge PDFs -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/merge' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-merge">
+                                <i class="fa-solid fa-layer-group fa-lg tool-icon icon-merge"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Merge PDFs</h5>
+                            <p class="text-muted small flex-grow-1">Merge multiple PDFs into one</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Rotate PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/rotate' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-rotate">
+                                <i class="fa-solid fa-rotate-right fa-lg tool-icon icon-rotate"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Rotate PDF</h5>
+                            <p class="text-muted small flex-grow-1">Rotate pages in your PDF</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Compress PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/compress' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-compress">
+                                <i class="fa-solid fa-compress fa-lg tool-icon icon-compress"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Compress PDF</h5>
+                            <p class="text-muted small flex-grow-1">Reduce PDF file size without losing quality</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- PDF to Word -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/pdf-to-word' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-pdf-to-word">
+                                <i class="fa-solid fa-file-word fa-lg tool-icon icon-pdf-to-word"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">PDF → Word</h5>
+                            <p class="text-muted small flex-grow-1">Convert PDF to editable Word document</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- PDF to Excel -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/pdf-to-excel' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-pdf-to-excel">
+                                <i class="fa-solid fa-file-excel fa-lg tool-icon icon-pdf-to-excel"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">PDF → Excel</h5>
+                            <p class="text-muted small flex-grow-1">Convert PDF tables to Excel</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- PDF to PPT -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/pdf-to-ppt' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-pdf-to-ppt">
+                                <i class="fa-solid fa-file-powerpoint fa-lg tool-icon icon-pdf-to-ppt"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">PDF → PPT</h5>
+                            <p class="text-muted small flex-grow-1">Convert PDF pages to PowerPoint slides</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- PDF to JPG -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/pdf-to-jpg' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-pdf-to-jpg">
+                                <i class="fa-solid fa-file-image fa-lg tool-icon icon-pdf-to-jpg"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">PDF → JPG</h5>
+                            <p class="text-muted small flex-grow-1">Convert PDF pages to high-quality images</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- PDF to Text -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/pdf-to-text' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-pdf-to-text">
+                                <i class="fa-solid fa-file-lines fa-lg tool-icon icon-pdf-to-text"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">PDF → Text</h5>
+                            <p class="text-muted small flex-grow-1">Extract text content from PDF</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- OCR PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/ocr' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-ocr">
+                                <i class="fa-solid fa-eye fa-lg tool-icon icon-ocr"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">OCR PDF</h5>
+                            <p class="text-muted small flex-grow-1">Perform OCR to extract text from scanned PDFs</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Unlock PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/unlock' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-unlock-pdf">
+                                <i class="fa-solid fa-unlock fa-lg tool-icon icon-unlock-pdf"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Unlock PDF</h5>
+                            <p class="text-muted small flex-grow-1">Remove password protection from PDFs</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Protect PDF -->
+            <div class="col-xl-3 col-lg-4 col-md-6 tool-item">
+                <a href='/tool-page/protect' class="text-decoration-none">
+                    <div class="card tool-card h-100 shadow-sm border-black transition-all clickable-card">
+                        <div class="card-body text-center p-4 d-flex flex-column">
+                            <div class="tool-icon-wrapper mb-3 mx-auto rounded-circle p-3 icon-clickable tool-icon-protect-pdf">
+                                <i class="fa-solid fa-shield-halved fa-lg tool-icon icon-protect-pdf"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2 text-dark">Protect PDF</h5>
+                            <p class="text-muted small flex-grow-1">Add password protection and permissions to PDFs</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- No results message (hidden by default) -->
+        <div class="row mt-5 d-none" id="noResults">
+            <div class="col-12 text-center">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No tools found</h4>
+                <p class="text-muted">Try different search terms</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hero Section -->
+<section class="hero-section py-5 bg-gradient-primary text-white text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Why Professionals Choose Us</h1>
+        <p class="lead">Enterprise-grade security and performance</p>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+
+            <!-- Feature 1: Security -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper feature-icon-security">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>Military-Grade Security</h5>
+                    <p>AES-256 encryption with automatic file deletion after processing.</p>
+                </div>
+            </div>
+
+            <!-- Feature 2: Speed -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper feature-icon-speed">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h5>High-Speed Processing</h5>
+                    <p>Distributed processing ensures your documents are handled in seconds.</p>
+                </div>
+            </div>
+
+            <!-- Feature 3: Batch -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper feature-icon-batch">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h5>Batch Processing</h5>
+                    <p>Process hundreds of files simultaneously with our batch operations.</p>
+                </div>
+            </div>
+
+            <!-- Feature 4: Cloud Storage -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: rgba(13,202,240,0.1);">
+                        <i class="fas fa-cloud text-info"></i>
+                    </div>
+                    <h5>Cloud Integration <span class="badge bg-secondary">Coming Soon</span> </h5>
+                    <p>Seamlessly store and access your documents securely in the cloud.</p>
+                </div>
+            </div>
+
+            <!-- Feature 5: Multi-Platform -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: rgba(108,117,125,0.1);">
+                        <i class="fas fa-desktop text-secondary"></i>
+                    </div>
+                    <h5>Multi-Platform Support <span class="badge bg-secondary">Coming Soon</span> </h5>
+                    <p>Works on desktop, web, and mobile devices without any hassle.</p>
+                </div>
+            </div>
+
+            <!-- Feature 6: Custom Workflows -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: rgba(255,193,7,0.1);">
+                        <i class="fas fa-cogs text-warning"></i>
+                    </div>
+                    <h5>Custom Workflows <span class="badge bg-secondary">Coming Soon</span> </h5>
+                    <p>Automate repetitive tasks and tailor processes for your team's efficiency.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- Enterprise Solutions -->
+<section id="enterprise" class="py-5 bg-dark text-white">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold mb-4">Enterprise Solutions</h2>
+                <p class="lead mb-4">Need custom implementation or volume processing? Our enterprise solutions provide:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> White-label options <span class="badge bg-secondary">Coming Soon</span></li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> API access <span class="badge bg-secondary">Coming Soon</span></li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Dedicated support <span class="badge bg-secondary">Coming Soon</span></li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Custom workflows <span class="badge bg-secondary">Coming Soon</span></li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> On-premise deployment <span class="badge bg-secondary">Coming Soon</span></li>
+                </ul>
+                <a href="/contact" class="btn btn-primary btn-lg rounded-pill px-4 mt-3">Contact Sales</a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="enterprise-graphic bg-secondary bg-opacity-25 rounded-3 p-4 position-relative">
+                    <div class="server-icon">
+                        <i class="fas fa-server text-info position-absolute" style="font-size: 4rem; top: 20px; left: 30px;"></i>
+                    </div>
+                    <div class="api-icon">
+                        <i class="fas fa-code text-warning position-absolute" style="font-size: 3.5rem; top: 90px; right: 40px;"></i>
+                    </div>
+                    <div class="cloud-icon">
+                        <i class="fas fa-cloud text-success position-absolute" style="font-size: 4.5rem; bottom: 30px; left: 40px;"></i>
+                    </div>
+                    <div class="shield-icon">
+                        <i class="fas fa-shield-alt text-primary position-absolute" style="font-size: 3.8rem; bottom: 80px; right: 30px;"></i>
+                    </div>
+                    <div class="main-building">
+                        <i class="fas fa-building text-white opacity-75" style="font-size: 5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toolSearch = document.getElementById('toolSearch');
+        const searchButton = document.getElementById('searchButton');
+        const toolItems = document.querySelectorAll('.tool-item');
+        const noResults = document.getElementById('noResults');
+        
+        function performSearch() {
+            const searchText = toolSearch.value.toLowerCase();
+            let visibleCount = 0;
+            
+            toolItems.forEach(item => {
+                const toolName = item.querySelector('h5').textContent.toLowerCase();
+                const toolDesc = item.querySelector('p').textContent.toLowerCase();
+                const isVisible = toolName.includes(searchText) || toolDesc.includes(searchText);
+                
+                item.style.display = isVisible ? 'block' : 'none';
+                if (isVisible) visibleCount++;
+            });
+            
+            // Show/hide no results message
+            if (visibleCount === 0 && searchText.length > 0) {
+                noResults.classList.remove('d-none');
+            } else {
+                noResults.classList.add('d-none');
+            }
+        }
+        
+        if (toolSearch) {
+            toolSearch.addEventListener('keyup', performSearch);
+        }
+        
+        if (searchButton) {
+            searchButton.addEventListener('click', performSearch);
+        }
+
+        // Add animation to cards on hover
+        const toolCards = document.querySelectorAll('.tool-card');
+        toolCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px)';
+                card.style.boxShadow = '0 0.5rem 1.5rem rgba(0, 0, 0, 0.1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
+            });
+        });
+    });
+</script>
+{% endblock %}

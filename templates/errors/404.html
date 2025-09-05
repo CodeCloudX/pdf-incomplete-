@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found | PDFMaster{% endblock %}
+
+{% block content %}
+<section class="d-flex flex-column justify-content-center align-items-center text-center py-5 bg-gradient-primary text-white" style="min-height:80vh;">
+    <!-- Online Logo -->
+    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" 
+         alt="PDFMaster Logo" class="mb-4" style="max-height:80px;">
+    
+    <h1 class="display-1 fw-bold">404</h1>
+    <h2 class="fw-semibold mb-3">Oops! Page Not Found</h2>
+    <p class="mb-4">
+        The page you are looking for might have been removed, renamed, or is temporarily unavailable.
+    </p>
+    <a href="{{ url_for('home') }}" class="btn btn-light btn-lg shadow-sm">
+        <i class="fa fa-home me-2"></i> Back to Home
+    </a>
+</section>
+{% endblock %}

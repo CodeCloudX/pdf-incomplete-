@@ -1,0 +1,670 @@
+{% extends "base.html" %}
+{% block title %}{{ tool.name }} - PDF Tools{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<style>
+  /* Active state for tool links */
+  .list-group-item.active {
+    background-color: #f8f9fa !important;
+    color: #0d6efd !important;
+    border-left: 3px solid #0d6efd !important;
+    font-weight: 600;
+  }
+
+  .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Upload area styling */
+  .upload-box {
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .upload-box:hover, .drag-over {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+
+  .border-dashed {
+    border-style: dashed;
+  }
+
+  /* File item styling */
+  .file-item {
+    transition: all 0.2s ease;
+  }
+
+  .file-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .remove-btn {
+    opacity: 0.7;
+    transition: all 0.2s ease;
+  }
+
+  .remove-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  
+  .password-warning {
+  font-weight: bold;
+  color: red;
+  }
+
+
+  /* Alert animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .alert {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  /* Popup styling */
+  .popup-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 1001;
+    text-align: center;
+    display: none;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: none;
+  }
+
+  /* Centered message styling - UPDATED */
+  .centered-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .centered-alert {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    animation: fadeIn 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Selected files container relative positioning for absolute children */
+  #fileListContainer {
+    position: relative;
+    min-height: 200px;
+  }
+  
+  /* Ensure the upload section bottom aligns with Pro Tip */
+  .col-lg-9 .card {
+    min-height: 650px; /* Adjust this value to match Pro Tip container height */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card-body {
+    flex: 1;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Sidebar with tool info -->
+    <div class="col-lg-3">
+      <!-- Tool Info Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title fw-bold text-primary mb-3">{{ tool.name }}</h4>
+          <p class="card-text text-muted">{{ tool.description }}</p>
+          <div class="mt-4">
+            <h6 class="fw-semibold mb-3"><i class="fas fa-info-circle me-2" aria-hidden="true"></i>How it works</h6>
+            <ol class="ps-3 small">
+              <li class="mb-2">Upload your PDF files</li>
+              <li class="mb-2">Configure any settings</li>
+              <li class="mb-2">Process your files</li>
+              <li class="mb-2">Download the results</li>
+            </ol>
+          </div>
+          <div class="mt-4">
+            <h6 class="fw-semibold mb-3"><i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>Important notes</h6>
+            <ul class="list-unstyled small">
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-2" aria-hidden="true"></i> Max 5 files per process</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-2" aria-hidden="true"></i> Files are processed securely</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-2" aria-hidden="true"></i> No storage of your documents</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other Tools Card (4 only) -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="fas fa-tools me-2 text-primary" aria-hidden="true"></i>Other Tools</h6>
+          <div class="list-group list-group-flush">
+            <a href="/tool/split" class="list-group-item list-group-item-action border-0 py-2 px-0 {% if tool.id == 'split' %}active{% endif %}">
+              <div class="d-flex align-items-center"><i class="fas fa-cut text-info me-2" aria-hidden="true"></i>Split PDF</div>
+            </a>
+            <a href="/tool/merge" class="list-group-item list-group-item-action border-0 py-2 px-0 {% if tool.id == 'merge' %}active{% endif %}">
+              <div class="d-flex align-items-center"><i class="fas fa-object-group text-success me-2" aria-hidden="true"></i>Merge PDF</div>
+            </a>
+            <a href="/tool/rotate" class="list-group-item list-group-item-action border-0 py-2 px-0 {% if tool.id == 'rotate' %}active{% endif %}">
+              <div class="d-flex align-items-center"><i class="fas fa-redo text-warning me-2" aria-hidden="true"></i>Rotate PDF</div>
+            </a>
+            <a href="/tool/compress" class="list-group-item list-group-item-action border-0 py-2 px-0 {% if tool.id == 'compress' %}active{% endif %}">
+              <div class="d-flex align-items-center"><i class="fas fa-compress text-primary me-2" aria-hidden="true"></i>Compress PDF</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pro Tip Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="fas fa-lightbulb me-2 text-warning" aria-hidden="true"></i>Pro Tip</h6>
+          <div class="bg-light rounded p-3 small">
+            <p id="toolTipContent" class="mb-0">
+              {% if tool.id == 'compress' %}
+                For best compression results, try adjusting the quality setting based on your needs. Lower quality gives smaller file sizes.
+              {% elif tool.id == 'merge' %}
+                Drag and drop files to reorder them before merging. The order determines how pages will appear in the final document.
+              {% elif tool.id == 'split' %}
+                Use the range selector to specify exact page ranges for more control over how your PDF is split.
+              {% elif tool.id == 'unlock' %}
+                Make sure to remember your password. We cannot recover it if you forget.
+              {% elif tool.id == 'protect' %}
+                Make sure to remember your password. We cannot recover it if you forget.
+              {% else %}
+                Make sure your PDFs aren't password protected before processing, unless using the unlock tool.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Upload Area -->
+    <div class="col-lg-9">
+      <form id="uploadForm" enctype="multipart/form-data">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0"><i class="fas fa-upload me-2" aria-hidden="true"></i>Upload PDF Files</h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info border-0 text-center">
+              <i class="fas fa-info-circle me-2" aria-hidden="true"></i>You can upload up to <strong>5 PDF files</strong> (Max 10MB each)
+            </div>
+
+            <!-- Regular warning container -->
+            <div id="warningContainer" class="text-center"></div>
+            
+            <!-- Condition error (centered) -->
+            <div id="conditionError" class="centered-message" style="display: none;">
+              <div class="alert alert-danger centered-alert"></div>
+            </div>
+
+            <!-- Upload Box -->
+            <div class="upload-container position-relative p-4 mb-4 rounded bg-light">
+              <div id="fileBox" class="upload-box text-center p-5 border-dashed rounded w-100" role="button" tabindex="0">
+                <div class="upload-icon mb-3"><i class="fa fa-cloud-upload fa-3x text-primary"></i></div>
+                <h5 class="fw-semibold">Drag & Drop Files Here</h5>
+                <p class="text-muted mb-3">or click to browse your files</p>
+                <small class="text-muted">Supported format: PDF (Max 5 files, 10MB each)</small>
+              </div>
+              <input type="file" id="fileInput" accept=".pdf" style="display:none;" multiple>
+            </div>
+
+            <!-- Selected Files List -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Selected Files</h6>
+                <button type="button" id="clearAllBtn" class="btn btn-sm btn-outline-secondary" disabled>
+                  <i class="fas fa-times me-1"></i>Clear All
+                </button>
+              </div>
+              <div id="fileListContainer" class="bg-light rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                <!-- Centered warning container - MOVED INSIDE FILE LIST CONTAINER -->
+                <div id="centeredWarningContainer" class="centered-message" style="display: none;"></div>
+                
+                <div id="emptyState" class="text-center py-4">
+                  <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                  <p class="text-muted mb-0">No files selected</p>
+                </div>
+                <ul id="fileListBox" class="list-unstyled mb-0" style="display: none;"></ul>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="text-muted small" id="totalSize">Total size: 0 MB</div>
+                <div class="text-muted small" id="fileCount">0/5 files</div>
+              </div>
+            </div>
+
+            <!--{% if tool.id in ['unlock'] %}
+            <div class="mb-4 text-center">
+              <label for="passwordInput" class="form-label fw-semibold">
+                {{ 'Password to unlock' if tool.id == 'unlock' }}
+              </label>
+              <div class="input-group mx-auto" style="max-width: 400px;">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="passwordInput" name="password" placeholder="{{ 'Enter PDF password' if tool.id == 'unlock' else 'Set protection password' }}">
+                <button type="button" class="btn btn-outline-secondary toggle-password"><i class="fas fa-eye"></i></button>
+              </div>
+              <div id="passwordHelp" class="form-text">
+                {{ 'For unlocking your PDF files' if tool.id == 'unlock' else 'For protecting your PDF files' }}
+              </div>
+            </div>
+            {% endif %}-->
+
+            <div class="d-flex justify-content-center border-top pt-4">
+              <button type="button" id="uploadNextBtn" data-tool="{{ tool.id }}" class="btn btn-primary px-4 rounded-pill">
+                <span class="upload-text">Process Files</span>
+                <span class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
+              </button>
+            </div>
+
+            <!-- Progress & Details -->
+            <div id="uploadProgress" class="progress mt-4 mx-auto" style="display: none; height: 32px; border-radius: 16px; max-width: 500px;">
+              <div id="progressFill" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%"></div>
+              <span id="progressText" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center fw-bold text-dark">0%</span>
+            </div>
+
+            <div id="uploadDetails" class="mt-3 row text-center" style="display: none;">
+              <div class="col-md-4">
+                <div class="fw-semibold">Processed</div>
+                <div class="h5 mb-0"><span id="processedCount">0</span>/<span id="totalCount">0</span></div>
+              </div>
+              <div class="col-md-4">
+                <div class="fw-semibold">Time remaining</div>
+                <div class="h5 mb-0" id="timeRemaining">--</div>
+              </div>
+              <div class="col-md-4">
+                <div class="fw-semibold">Status</div>
+                <div class="h5 mb-0"><span class="badge bg-info" id="statusText">Waiting</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      
+      <div class="popup-message" id="uploadPopup">
+        <i class="fas fa-file-pdf"></i>
+        <h4>Please upload PDF files</h4>
+        <p>Only PDF files are supported for processing</p>
+      </div>
+      <div class="overlay" id="popupOverlay"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const TOOL_ID = "{{ tool.id | default('split')}}";
+  const MAX_FILES_GLOBAL = {{ tool.max_files | default(5) }}; // Use a different name to avoid conflict
+  const MAX_SIZE_GLOBAL = {{ tool.max_size | default(10) }} * 1024 * 1024;  // Convert MB to bytes
+
+  // Add active class styling for sidebar links
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set active state for the current tool
+    const currentTool = "{{ tool.id }}";
+    const toolLinks = document.querySelectorAll('.list-group-item');
+    
+    toolLinks.forEach(link => {
+      if (link.getAttribute('href').includes(currentTool)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fileBox = document.getElementById('fileBox');
+  const fileInput = document.getElementById('fileInput');
+  const fileListBox = document.getElementById('fileListBox');
+  const emptyState = document.getElementById('emptyState');
+  const uploadNextBtn = document.getElementById('uploadNextBtn');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  const centeredWarningContainer = document.getElementById('centeredWarningContainer');
+  const passwordInput = document.getElementById('passwordInput'); // May be null if not unlock/protect tool
+  const totalSizeElement = document.getElementById('totalSize');
+  const fileCountElement = document.getElementById('fileCount');
+  const uploadText = document.querySelector('.upload-text');
+  const uploadSpinner = document.querySelector('.spinner-border');
+  const toolId = typeof TOOL_ID !== 'undefined' ? TOOL_ID : 'default';
+
+  let uploadedFiles = [];
+  let totalSize = 0;
+  const MAX_FILES_ALLOWED = MAX_FILES_GLOBAL; // From Jinja context
+  const MAX_FILE_SIZE_BYTES = MAX_SIZE_GLOBAL; // From Jinja context
+  const MAX_TOTAL_SIZE_BYTES = MAX_SIZE_GLOBAL; // Assuming total size limit same as individual for simplicity
+
+  // --- Helper Functions ---
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} bytes`;
+    else if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    else return `${(bytes / 1048576).toFixed(1)} MB`;
+  }
+
+  function showCenteredWarning(msg, type = 'error') {
+    if (!centeredWarningContainer) return;
+    
+    const types = {
+      error: 'alert-danger', 
+      warning: 'alert-warning', 
+      success: 'alert-success', 
+      info: 'alert-info'
+    };
+    
+    const icons = {
+      error: 'fa-exclamation-circle', 
+      warning: 'fa-exclamation-triangle', 
+      success: 'fa-check-circle', 
+      info: 'fa-info-circle'
+    };
+
+    centeredWarningContainer.innerHTML = ''; // Clear previous messages
+    const alert = document.createElement('div');
+    alert.className = `alert ${types[type] || 'alert-info'} centered-alert`;
+    alert.innerHTML = `
+      <i class="fas ${icons[type] || 'fa-info-circle'} me-2"></i>
+      ${msg}
+    `;
+    centeredWarningContainer.appendChild(alert);
+    centeredWarningContainer.style.display = 'block';
+
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.5s ease-out';
+        setTimeout(() => {
+          centeredWarningContainer.style.display = 'none';
+          centeredWarningContainer.innerHTML = '';
+          centeredWarningContainer.style.opacity = '1';
+        }, 500);
+      }
+    }, 2000);
+  }
+
+  // --- FIXED: Mark password protected file in UI ---
+  function markFileAsPasswordProtected(filename) {
+    const fileItems = document.querySelectorAll('.file-item');
+    fileItems.forEach(item => {
+      const nameElem = item.querySelector('.filename');
+      if (nameElem) {
+        // Get only the first text node content (filename) ignoring appended spans
+        const displayedName = nameElem.childNodes[0] ? nameElem.childNodes[0].textContent.trim() : '';
+        if (displayedName === filename) {
+          if (!nameElem.querySelector('.password-warning')) {
+            const warning = document.createElement('span');
+            warning.className = 'password-warning';
+            warning.style.marginLeft = '10px';
+            warning.textContent = '(Password protected)';
+            nameElem.appendChild(warning);
+          }
+        }
+      }
+    });
+  }
+
+  // --- File List Management ---
+
+  function renderFileList() {
+    if (uploadedFiles.length === 0) {
+      fileListBox.style.display = 'none';
+      emptyState.style.display = 'block';
+      clearAllBtn.disabled = true;
+      uploadNextBtn.disabled = true;
+      return;
+    }
+
+    fileListBox.innerHTML = ''; // Clear existing list items
+    fileListBox.style.display = 'block';
+    emptyState.style.display = 'none';
+    clearAllBtn.disabled = false;
+    uploadNextBtn.disabled = false;
+
+    uploadedFiles.forEach((file, index) => {
+      const li = document.createElement('li');
+      li.className = 'file-item p-2 mb-2 bg-white rounded d-flex justify-content-between align-items-center';
+      li.innerHTML = `
+        <div class="d-flex align-items-center" style="flex:1; min-width:0;">
+          <i class="fas fa-file-pdf text-danger me-2"></i>
+          <div style="min-width:0; flex:1;">
+            <div class="filename text-truncate">${file.name}</div>
+            <div class="file-size text-muted small">${formatFileSize(file.size)}</div>
+          </div>
+        </div>
+        <button type="button" class="remove-btn btn btn-sm btn-outline-danger" data-index="${index}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      fileListBox.appendChild(li);
+
+      li.querySelector('.remove-btn').addEventListener('click', () => {
+        totalSize -= uploadedFiles[index].size; // Update total size
+        uploadedFiles.splice(index, 1);
+        renderFileList(); // Re-render the list
+        updateFileCount();
+        updateTotalSize();
+      });
+    });
+    updateFileCount();
+    updateTotalSize();
+  }
+
+  function updateFileCount() {
+    if (fileCountElement) {
+      fileCountElement.textContent = `${uploadedFiles.length}/${MAX_FILES_ALLOWED} files`;
+    }
+  }
+
+  function updateTotalSize() {
+    if (totalSizeElement) {
+      totalSizeElement.textContent = `Total size: ${formatFileSize(totalSize)}`;
+    }
+  }
+
+  // --- File Handling Logic ---
+
+  function handleFiles(files) {
+    if (!files.length) return;
+
+    const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+    if (pdfFiles.length === 0) {
+      showCenteredWarning('Please select PDF files only!');
+      return;
+    }
+
+    // Single file enforcement for unlock/protect tools
+    const isSingleFileTool = ['unlock', 'protect'].includes(toolId);
+    if (isSingleFileTool) {
+      if (pdfFiles.length > 1 || (uploadedFiles.length > 0 && pdfFiles.length > 0)) {
+        showCenteredWarning(`This tool only supports a single PDF file. Please upload one file at a time.`, 'warning');
+        return; // Prevent adding more than one file
+      }
+      // Clear existing files if any before adding new single file
+      if (uploadedFiles.length > 0) {
+        uploadedFiles = [];
+        totalSize = 0;
+      }
+    }
+
+    let filesAdded = 0;
+    for (const file of pdfFiles) {
+      if (uploadedFiles.length >= MAX_FILES_ALLOWED) {
+        showCenteredWarning(`Maximum ${MAX_FILES_ALLOWED} files allowed.`, 'warning');
+        break;
+      }
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        showCenteredWarning(`${file.name} exceeds ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB limit!`, 'warning');
+        continue;
+      }
+      if (totalSize + file.size > MAX_TOTAL_SIZE_BYTES) {
+        showCenteredWarning(`Total file size exceeds ${MAX_TOTAL_SIZE_BYTES / (1024 * 1024)}MB limit!`, 'warning');
+        continue;
+      }
+
+      uploadedFiles.push(file);
+      totalSize += file.size;
+      filesAdded++;
+    }
+
+    if (filesAdded > 0) {
+      renderFileList();
+    }
+  }
+
+  // --- Preview/Process Logic ---
+
+  function validateToolConditions() {
+    const isSingleFileTool = ['unlock', 'protect'].includes(toolId);
+    if (isSingleFileTool) {
+      if (uploadedFiles.length !== 1) {
+        showCenteredWarning(`This tool requires exactly one PDF file. Please upload a single file.`, "warning");
+        return false;
+      }
+    }
+
+    switch(toolId) {
+      case 'merge':
+        if (uploadedFiles.length < 2) {
+          showCenteredWarning("Please upload at least 2 PDF files to merge.", "warning");
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+    return true;
+  }
+
+  async function handlePreview() {
+    if (!validateToolConditions()) return;
+
+    uploadNextBtn.disabled = true;
+    uploadText.textContent = 'Generating Preview...';
+    uploadSpinner.style.display = 'inline-block';
+
+    const formData = new FormData();
+    uploadedFiles.forEach(f => formData.append('files', f));
+
+    if (toolId === 'unlock' && passwordInput && passwordInput.value.trim() !== "") {
+      formData.append('password', passwordInput.value.trim());
+    }
+
+    try {
+      const response = await fetch(`/tool/${toolId}/preview`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          throw new Error('Server returned an unexpected error format.');
+        }
+
+        if (errorData.error) {
+          showCenteredWarning(errorData.error, 'error');
+          const match = errorData.error.match(/File '(.+?)' is password protected/);
+          if (match) {
+            markFileAsPasswordProtected(match[1]);
+          }
+        } else {
+          showCenteredWarning('Preview generation failed: Unknown server response.', 'error');
+        }
+        throw new Error("You cannot upload password-protected PDF files. Please use the 'Unlock PDF' tool first.");
+      }
+
+      const html = await response.text();
+      document.open();
+      document.write(html);
+      document.close();
+
+    } catch (err) {
+      console.error('Preview error:', err);
+      showCenteredWarning(err.message || 'Error generating preview. Please try again.', 'error');
+
+      uploadNextBtn.disabled = false;
+      uploadText.textContent = 'Process Files';
+      uploadSpinner.style.display = 'none';
+    }
+  }
+
+  // --- Event Listeners ---
+
+  // Password toggle
+  const togglePasswordBtn = document.querySelector('.toggle-password');
+  if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+      togglePasswordBtn.querySelector('i').classList.toggle('fa-eye-slash');
+      togglePasswordBtn.querySelector('i').classList.toggle('fa-eye');
+    });
+  }
+
+  // File input and drag/drop
+  fileBox.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+  ['dragenter', 'dragover'].forEach(evt =>
+    fileBox.addEventListener(evt, e => {
+      e.preventDefault();
+      fileBox.classList.add('drag-over');
+    })
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    fileBox.addEventListener(evt, e => {
+      e.preventDefault();
+      fileBox.classList.remove('drag-over');
+    })
+  );
+  fileBox.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+
+  // Clear all button
+  clearAllBtn.addEventListener('click', () => {
+    uploadedFiles = [];
+    totalSize = 0;
+    renderFileList();
+  });
+
+  // Process Files button
+  uploadNextBtn.addEventListener('click', handlePreview);
+
+  // Initial render on page load
+  renderFileList();
+});
+
+</script>
+{% endblock %}

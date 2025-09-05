@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}All Tools - PDFMaster Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-3">PDF Tools Collection</h1>
+            <p class="lead text-muted">Comprehensive suite of professional PDF manipulation tools</p>
+            <div class="border-bottom mx-auto" style="width: 100px; height: 3px; background: linear-gradient(90deg, #0d6efd, #6f42c1);"></div>
+        </div>
+    </div>
+
+    <!-- Tools Grid -->
+    <div class="row g-4">
+        <!-- Split PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='split') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #6f42c1;">
+                                <i class="fa-solid fa-scissors fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Split PDF</h5>
+                        <p class="card-text text-muted mb-0">Split your PDF into multiple files.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Merge PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='merge') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #0d6efd;">
+                                <i class="fa-solid fa-object-group fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Merge PDF</h5>
+                        <p class="card-text text-muted mb-0">Combine multiple PDFs into one.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Compress PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='compress') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #20c997;">
+                                <i class="fa-solid fa-compress-alt fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Compress PDF</h5>
+                        <p class="card-text text-muted mb-0">Reduce PDF file size.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Rotate PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='rotate') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #fd7e14;">
+                                <i class="fa-solid fa-redo fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Rotate PDF</h5>
+                        <p class="card-text text-muted mb-0">Rotate PDF pages.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- PDF to Word -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='pdf-to-word') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #1a73e8;">
+                                <i class="fa-solid fa-file-word fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">PDF to Word</h5>
+                        <p class="card-text text-muted mb-0">Convert PDF to Word format.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- PDF to Excel -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='pdf-to-excel') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #0fb900;">
+                                <i class="fa-solid fa-file-excel fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">PDF to Excel</h5>
+                        <p class="card-text text-muted mb-0">Convert PDF to Excel format.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- PDF to PowerPoint -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='pdf-to-ppt') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #f24726;">
+                                <i class="fa-solid fa-file-powerpoint fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">PDF to PowerPoint</h5>
+                        <p class="card-text text-muted mb-0">Convert PDF to PowerPoint format.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- PDF to JPG -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='pdf-to-jpg') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #dc3545;">
+                                <i class="fa-solid fa-file-image fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">PDF to JPG</h5>
+                        <p class="card-text text-muted mb-0">Convert PDF to JPG images.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- PDF to Text -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='pdf-to-text') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #6c757d;">
+                                <i class="fa-solid fa-file-alt fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">PDF to Text</h5>
+                        <p class="card-text text-muted mb-0">Extract text from PDF.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- OCR PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='ocr') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #6f42c1;">
+                                <i class="fa-solid fa-eye fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">OCR PDF</h5>
+                        <p class="card-text text-muted mb-0">Perform OCR on scanned PDF.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Unlock PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='unlock') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #ffc107;">
+                                <i class="fa-solid fa-unlock fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Unlock PDF</h5>
+                        <p class="card-text text-muted mb-0">Remove PDF password.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Protect PDF -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <a href="{{ url_for('tool_page_old', tool_id='protect') }}" class="text-decoration-none">
+                <div class="card tool-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <!-- Tool Icon -->
+                        <div class="text-center mb-4">
+                            <div class="icon-wrapper rounded-circle d-inline-flex align-items-center justify-content-center" style="background: #198754;">
+                                <i class="fa-solid fa-lock fa-lg tool-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool Content -->
+                        <h5 class="card-title fw-semibold mb-3 text-dark">Protect PDF</h5>
+                        <p class="card-text text-muted mb-0">Add password to PDF.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+	    <!-- Popular Tools Section -->
+    <div class="row mt-6">
+        <div class="col-12">
+            <h2 class="fw-bold mb-4 text-center">Most Popular Tools</h2>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                {% for tool_id in ['split', 'merge', 'compress', 'pdf-to-word'] %}
+                <a href="{{ url_for('tool_page_old', tool_id=tool_id) }}" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="{{ tools[tool_id].icon }} me-2"></i>{{ tools[tool_id].name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tool-card {
+    transition: all 0.3s ease;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 1.5rem 2.5rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.hover-shadow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+    border-radius: 20px;
+}
+
+.icon-wrapper {
+    transition: all 0.3s ease;
+    width: 80px;
+    height: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-card:hover .icon-wrapper {
+    transform: scale(1.1);
+}
+
+.mt-6 {
+    margin-top: 5rem;
+}
+
+.tool-icon {
+    color: white;
+    font-size: 1.8rem;
+}
+</style>
+
+<script>
+// Add subtle animation when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const toolCards = document.querySelectorAll('.tool-card');
+    
+    toolCards.forEach((card, index) => {
+        // Add slight delay for staggered animation
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100 + (index * 100));
+    });
+});
+</script>
+{% endblock %}

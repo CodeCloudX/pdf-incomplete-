@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error | PDFMaster{% endblock %}
+
+{% block content %}
+<section class="d-flex flex-column justify-content-center align-items-center text-center py-5 bg-gradient-primary text-white" style="min-height:80vh;">
+    <!-- Online Logo -->
+    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" 
+         alt="PDFMaster Logo" class="mb-4" style="max-height:80px;">
+    
+    <h1 class="display-1 fw-bold">500</h1>
+    <h2 class="fw-semibold mb-3">Internal Server Error</h2>
+    <p class="mb-4">
+        Something went wrong on our side. Our engineers are working to fix it. Please try again later.
+    </p>
+    <a href="{{ url_for('home') }}" class="btn btn-light btn-lg shadow-sm">
+        <i class="fa fa-rotate-left me-2"></i> Go Back Home
+    </a>
+</section>
+{% endblock %}

@@ -1,0 +1,1877 @@
+{% set hide_footer = True %}
+{% extends "base.html" %}
+
+{% block title %}Preview - {{ tool_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+    .tool-icon-sidebar {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        float: left;
+        font-size: 24px;
+        color: white;
+    }
+
+    /* Colorful tool icons */
+    .tool-split { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    .tool-merge { background: linear-gradient(135deg, #4834d4, #686de0); }
+    .tool-rotate { background: linear-gradient(135deg, #f0932b, #f6e58d); }
+    .tool-compress { background: linear-gradient(135deg, #6a89cc, #4a69bd); }
+    .tool-unlock { background: linear-gradient(135deg, #10ac84, #1dd1a1); }
+    .tool-protect { background: linear-gradient(135deg, #ee5253, #ff9ff3); }
+    .tool-pdf-to-word { background: linear-gradient(135deg, #2e86de, #54a0ff); }
+    .tool-pdf-to-excel { background: linear-gradient(135deg, #00d2d3, #01a3a4); }
+    .tool-pdf-to-ppt { background: linear-gradient(135deg, #ff9ff3, #f368e0); }
+    .tool-pdf-to-jpg { background: linear-gradient(135deg, #feca57, #ff9ff3); }
+    .tool-pdf-to-text { background: linear-gradient(135deg, #8395a7, #576574); }
+    .tool-ocr { background: linear-gradient(135deg, #0abde3, #48dbfb); }
+    .tool-default { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+
+    /* Preview Process Page Styles */
+    .preview-container {
+        background: #fff;
+        min-height: calc(100vh - 100px);
+        overflow-y: auto;
+        padding-bottom: 30px;
+        position: relative;
+    }
+
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .preview-item {
+        text-align: center;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 10px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .preview-item:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .preview-page {
+        width: 100% !important;
+        height: 200px !important;
+        object-fit: contain;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .preview-page.selected {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+
+    .page-number {
+        font-size: 12px;
+        font-weight: bold;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+
+    .form-check {
+        margin-top: 8px;
+    }
+
+    /* Tool specific styles */
+    .tool-specific-options {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border-left: 4px solid #007bff;
+    }
+
+    .page-selection-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .file-preview-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    .file-title {
+        color: #2c3e50;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+        margin-bottom: 15px;
+    }
+
+    /* Navigation and buttons */
+    .sidebar-container {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        height: calc(100vh - 80px);
+        position: sticky;
+        top: 80px;
+        overflow: hidden;
+        z-index: 1010;
+    }
+
+    .sidebar-container .list-group-item {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        margin-bottom: 8px;
+        border-radius: 6px;
+    }
+
+    .sidebar-container .list-group-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-container .list-group {
+        max-height: calc(100vh - 250px);
+        overflow-y: auto;
+    }
+
+    #processBtn {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    #processBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+    }
+
+    #backBtn {
+        border: 2px solid #6c757d;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+
+    /* Processing overlay */
+    #processingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .processing-popup {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Layout adjustments for fixed sidebars */
+    .container-fluid {
+        padding-top: 20px;
+    }
+
+    /* Left sidebar - fixed and non-scrollable */
+    .sidebar-container {
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 80px);
+        overflow: hidden;
+        z-index: 1010;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Right sidebar - fixed and non-scrollable */
+    .action-panel {
+        position: sticky;
+        top: 80px;
+        height: calc(100vh - 80px);
+        overflow: hidden;
+        z-index: 1010;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-panel-content {
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Middle section - scrollable */
+    .preview-container {
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        padding-bottom: 30px;
+    }
+
+    /* Ensure proper spacing between columns */
+    .border-end, .border-start {
+        height: 100%;
+    }
+
+    /* Tool info in left sidebar - FIXED VISIBILITY */
+    .tool-info-sidebar {
+        background: linear-gradient(135deg, #6c5ce7, #a29bff);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .tool-icon-sidebar {
+        font-size: 24px;
+        margin-right: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        float: left;
+    }
+    .tool-info-content {
+        overflow: hidden;
+    }
+    .tool-info-content h5 {
+        margin: 0;
+        font-weight: 600;
+        color: white;
+    }
+    .tool-info-content p.tool-description {
+        margin: 5px 0 0;
+        opacity: 0.9;
+        font-size: 0.85rem;
+        color: white;
+    }
+
+    /* File item with remove button */
+    .file-item {
+        position: relative;
+        padding-right: 40px;
+    }
+    .remove-file-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #dc3545;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .remove-file-btn:hover {
+        opacity: 1;
+    }
+
+    /* Confirmation modal */
+    .confirmation-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+    .confirmation-content {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Tool options styling - FIXED VISIBILITY */
+    .tool-options {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+    }
+
+    .tool-options .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .tool-options .form-check-label {
+        font-size: 0.9rem;
+        color: #495057;
+    }
+
+    .tool-options .form-select {
+        border-color: #ced4da;
+    }
+
+    .tool-options .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Process button section */
+    .process-section {
+        flex-shrink: 0;
+    }
+
+    /* Selection summary */
+    .selection-summary {
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+
+    /* Left sidebar content container */
+    .sidebar-content {
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .file-name {
+        max-width: 150px;
+        color: white;
+    }
+    .text-truncate-custom {
+        max-width: 200px;
+    }
+
+    /* Sticky page header */
+    .sticky-page-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Page selection options in sidebar */
+    .page-selection-options {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .page-selection-options h6 {
+        color: white;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 8px;
+    }
+    
+    .page-selection-options .form-check-label {
+        color: white;
+    }
+    
+    .page-selection-options .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .page-selection-options .form-range {
+        width: 100%;
+    }
+    
+    .range-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+	
+	/* Styles for encrypted PDF message */
+    .encrypted-pdf-message {
+        text-align: center;
+        padding: 30px;
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        color: #721c24;
+        margin-top: 20px;
+    }
+    .encrypted-pdf-message i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .preview-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .preview-page {
+            height: 150px !important;
+        }
+
+        .tool-specific-options,
+        .page-selection-panel {
+            padding: 15px;
+        }
+
+        .sidebar-container,
+        .action-panel {
+            position: relative;
+            height: auto;
+        }
+
+        .preview-container {
+            height: auto;
+        }
+
+        .sticky-page-header {
+            position: relative;
+        }
+        
+        .page-selection-options {
+            margin-top: 20px;
+        }
+    }
+
+    /* Range slider styling */
+    .form-range::-webkit-slider-thumb {
+        background: #007bff;
+    }
+
+    .form-range::-moz-range-thumb {
+        background: #007bff;
+    }
+
+    .form-range::-ms-thumb {
+        background: #007bff;
+    }
+
+    /* Make sure all text is visible in sidebars */
+    .sidebar-container h5,
+    .sidebar-container .fw-bold {
+        color: white !important;
+    }
+
+    .sidebar-container .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .action-panel h6,
+    .action-panel .fw-bold,
+    .action-panel .form-label {
+        color: #2c3e50 !important;
+    }
+    
+    /* No files message */
+    .no-files-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+        transition: opacity 2s ease;
+    }
+    
+    .fade-out {
+        opacity: 0;
+    }
+    
+    /* Alert messages */
+    .alert-container {
+        position: fixed;
+        top: 100px;
+        left: 50%; /* Center the alert horizontally */
+        transform: translateX(-50%); /* Adjust for centering */
+        z-index: 2000;
+        max-width: 400px;
+        width: 90%; /* Make it responsive */
+    }
+    
+    .alert {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateY(-20px); /* Start slightly above */
+        transition: all 0.3s ease;
+        text-align: center; /* Center text within the alert */
+    }
+    
+    .alert.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Custom scrollbar for sidebars */
+    .sidebar-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .sidebar-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    
+    .sidebar-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    
+    .sidebar-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+	
+/* Add styles for drag image */
+    .drag-image {
+        position: absolute;
+        pointer-events: none;
+        z-index: 10000;
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 6px;
+        box-shadow: 0 10px 20px rgba(0, 123, 255, 0.4);
+        padding: 8px 12px;
+        font-weight: 600;
+        color: #007bff;
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    /* Drag and drop styles for merge */
+    .file-order-item.dragging {
+        opacity: 0.6;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        border: 2px dashed #007bff !important;
+        background-color: rgba(0, 123, 255, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .file-order-item.drag-over {
+        border-top: 3px solid #007bff !important;
+        background-color: rgba(0, 123, 255, 0.05) !important;
+        transition: all 0.2s ease;
+    }
+    
+    .file-order-item {
+        transition: all 0.3s ease;
+        cursor: grab;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background-color: white;
+    }
+    
+    .file-order-item:active {
+        cursor: grabbing;
+    }
+    
+    .file-order-item .bi-grip-vertical {
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+    
+    .file-order-item:hover .bi-grip-vertical {
+        color: #007bff;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    
+    .file-order-item:hover {
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Process animation */
+    .process-animation {
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    .process-animation .spinner-border {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    /* Disabled radio buttons */
+    .form-check-input:disabled ~ .form-check-label {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar: Tool Info and File Selection -->
+        <div class="col-md-3 bg-light p-3 border-end sidebar-container">
+            <div class="sidebar-content">
+                <!-- Tool information -->
+                <div class="tool-info-sidebar">
+                    <div class="tool-icon-sidebar tool-{{ tool_id }}">
+                        {% if tool_id == 'split' %}
+                        <i class="bi bi-scissors"></i>
+                        {% elif tool_id == 'merge' %}
+                        <i class="bi bi-file-earmark-merge"></i>
+                        {% elif tool_id == 'rotate' %}
+                        <i class="bi bi-arrow-clockwise"></i>
+                        {% elif tool_id == 'compress' %}
+                        <i class="bi bi-file-zip"></i>
+                        {% elif tool_id == 'unlock' %}
+                        <i class="bi bi-unlock"></i>
+                        {% elif tool_id == 'protect' %}
+                        <i class="bi bi-lock"></i>
+                        {% elif tool_id == 'pdf-to-word' %}
+                        <i class="bi bi-file-earmark-word"></i>
+                        {% elif tool_id == 'pdf-to-excel' %}
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                        {% elif tool_id == 'pdf-to-ppt' %}
+                        <i class="bi bi-file-earmark-slides"></i>
+                        {% elif tool_id == 'pdf-to-jpg' %}
+                        <i class="bi bi-image"></i>
+                        {% elif tool_id == 'pdf-to-text' %}
+                        <i class="bi bi-file-text"></i>
+                        {% elif tool_id == 'ocr' %}
+                        <i class="bi bi-textarea"></i>
+                        {% else %}
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        {% endif %}
+                    </div>
+                    <div class="tool-info-content">
+                        <h5>Using: {{ tool_name }}</h5>
+                        <p class="tool-description">
+                            {% if tool_id == 'split' %}
+                            Split your PDF into separate files by page ranges or individual pages
+                            {% elif tool_id == 'merge' %}
+                            Combine multiple PDFs into a single document in your preferred order
+                            {% elif tool_id == 'rotate' %}
+                            Rotate pages in your PDF document by 90&deg;, 180&deg;, or 270&deg;
+                            {% elif tool_id == 'compress' %}
+                            Reduce the file size of your PDF while maintaining quality
+                            {% elif tool_id == 'unlock' %}
+                            Remove password protection from your PDF document With Privacy
+                            {% elif tool_id == 'protect' %}
+                            Add password protection and permissions to your PDF
+                            {% elif tool_id == 'pdf-to-word' %}
+                            Convert your PDF to an editable Word document
+                            {% elif tool_id == 'pdf-to-excel' %}
+                            Extract tables from your PDF to Excel format
+                            {% elif tool_id == 'pdf-to-ppt' %}
+                            Convert your PDF to a PowerPoint presentation
+                            {% elif tool_id == 'pdf-to-jpg' %}
+                            Convert each page of your PDF to JPG images
+                            {% elif tool_id == 'pdf-to-text' %}
+                            Extract text content from your PDF document
+                            {% elif tool_id == 'ocr' %}
+                            Extract text from scanned PDFs using OCR technology
+                            {% else %}
+                            Perform operations on your PDF documents
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                
+                <h5>Selected Files ({{ files|length }})</h5>
+                
+                <ul class="list-group mb-4" id="sidebarFileList">
+                    {% for file in files %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center file-item" data-file-index="{{ loop.index0 }}" data-filename="{{ file.name }}">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-file-pdf text-danger me-2"></i>
+                            <span class="file-name text-truncate">{{ file.original_name }}</span> {# Display original_name #}
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ file.page_count }} pages</span>
+                        <i class="bi bi-x-circle remove-file-btn" data-file-index="{{ loop.index0 }}"></i>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <!-- Page Selection Options (Moved to sidebar) -->
+                {% if tool_id not in ['unlock', 'protect'] %}
+                <div class="page-selection-options">
+                    <h6>Page Selection</h6>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="previewOption" id="previewAll" value="all">
+                            <label class="form-check-label" for="previewAll">All Pages</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="previewOption" id="previewRange" value="range" checked>
+                            <label class="form-check-label" for="previewRange">Range (First & Last)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-light btn-sm" id="selectAllBtn">Select All</button>
+                        <button class="btn btn-outline-light btn-sm" id="selectNoneBtn">Select None</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Preview -->
+        <div class="col-md-6 p-3 preview-container">
+            <!-- Sticky Page Header -->
+			{% if tool_id not in ['unlock', 'protect'] %}
+            <div class="sticky-page-header">
+                <h5 class="mb-0">Document Preview</h5>
+                <!-- Removed Zoom Buttons -->
+            </div>
+			{% endif %}
+            
+            <div id="previewContent" data-tool-id="{{ tool_id }}">
+                {% if tool_id in ['unlock', 'protect'] %}
+                <!-- Special Interface for Encrypted PDFs (Unlock/Protect) -->
+                <div class="encrypted-pdf-message">
+                    <i class="bi bi-lock-fill"></i>
+                    <h4>Password Protection</h4>
+                    <p>This tool does not Read Pdf for user Privacy. Please use the options on the right sidebar to {{ 'unlock' if tool_id == 'unlock' else 'protect' }} your PDF.</p>
+                    <p>The entire document will be processed.</p>
+                </div>
+                {% else %}
+                <!-- Page Selection Panel -->
+                <div class="page-selection-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Preview of selected pages:</span>
+                    </div>
+                    
+                    {% for file in files %}
+                    <div class="file-preview-section mb-4" id="preview-section-{{ loop.index0 }}" data-filename="{{ file.name }}">
+                        <h6 class="file-title" data-filename="{{ file.name }}">{{ file.original_name }} <span class="badge bg-secondary">{{ file.page_count }} pages</span></h6> {# Display original_name #}
+                        <div class="preview-grid" data-filename="{{ file.name }}">
+                            {% for thumb in file.thumbnails %}
+                            <div class="preview-item" data-filename="{{ file.name }}">
+                                <div class="page-number">Page {{ loop.index }}</div>
+                                <!-- Use the previews route to serve images -->
+                                <img src="{{ url_for('serve_preview', filename=thumb) }}" 
+                                     class="preview-page img-thumbnail"
+                                     data-page-index="{{ loop.index0 }}"
+                                     data-filename="{{ file.name }}"
+                                     onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input page-checkbox" type="checkbox" 
+                                                id="page_{{ file.name | replace(' ', '_') }}_{{ loop.index0 }}"
+                                                data-filename="{{ file.name }}"
+                                                data-page-index="{{ loop.index0 }}" checked>
+                                    <label class="form-check-label small" for="page_{{ file.name | replace(' ', '_') }}_{{ loop.index0 }}">
+                                        Include
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="selected_pages_{{ file.name }}" id="selected_pages_{{ file.name | replace(' ', '_') }}" value="{% for i in range(1, file.page_count + 1) %}{{ i }}{% if not loop.last %},{% endif %}{% endfor %}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Panel with Tool Options -->
+        <div class="col-md-3 bg-light p-3 border-start action-panel">
+            <div class="action-panel-content">
+                <!-- Tool Options Section -->
+                <div class="tool-options">
+                    <h6 class="fw-bold border-bottom pb-2 mb-3">{{ tool_name }} Options</h6>
+                    
+                    {% if tool_id == 'split' %}
+                    <!-- Split PDF Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Split Options:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="splitOption" id="splitAll" value="all" checked>
+                            <label class="form-check-label" for="splitAll">Split all pages into individual files</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="splitOption" id="splitRange" value="range">
+                            <label class="form-check-label" for="splitRange">Split by page ranges</label>
+                        </div>
+                    </div>
+                    <div id="rangeInput" class="mb-3" style="display: none;">
+                        <label class="form-label">Page Ranges (e.g., 1-3,5-7):</label>
+                        <input type="text" class="form-control" id="pageRanges" name="page_ranges" placeholder="1-3,5-7">
+                    </div>
+
+                    {% elif tool_id == 'merge' %}
+                    <!-- Merge PDF Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Merge Order:</label>
+                        <div id="fileOrderList" class="bg-white p-2 rounded border">
+                            {% for file in files %}
+                            <div class="d-flex align-items-center mb-2 file-order-item" data-filename="{{ file.name }}" data-original-filename="{{ file.original_name }}"> {# Add data-original-filename #}
+                                <i class="bi bi-grip-vertical text-muted me-2"></i>
+                                <span class="text-truncate text-truncate-custom">{{ file.original_name }}</span> {# Display original_name #}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">Drag to reorder files</small>
+                    </div>
+
+                    {% elif tool_id == 'rotate' %}
+                    <!-- Rotate PDF Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Rotation Angle:</label>
+                        <select class="form-select" id="rotationAngle" name="rotation_angle">
+                            <option value="90">90&deg; Clockwise</option>
+                            <option value="180">180&deg;</option>
+                            <option value="270">90&deg; Counter-Clockwise</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apply to:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rotateOption" id="rotateAll" value="all" checked>
+                            <label class="form-check-label" for="rotateAll">All selected pages</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rotateOption" id="rotateEven" value="even">
+                            <label class="form-check-label" for="rotateEven">Even pages only</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rotateOption" id="rotateOdd" value="odd">
+                            <label class="form-check-label" for="rotateOdd">Odd pages only</label>
+                        </div>
+                    </div>
+
+                    {% elif tool_id == 'compress' %}
+                    <!-- Compress PDF Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Compression Level:</label>
+                        <select class="form-select" id="compressionLevel" name="compression_level">
+                            <option value="low">Low (Better quality)</option>
+                            <option value="medium" selected>Medium (Recommended)</option>
+                            <option value="high">High (Smaller size)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quality (0.1-1.0):</label>
+                        <input type="range" class="form-range" id="compressionQuality" name="compression_quality" min="0.1" max="1.0" step="0.1" value="0.5">
+                        <div class="d-flex justify-content-between">
+                            <small>Low Quality</small>
+                            <small id="qualityValue">0.5</small>
+                            <small>High Quality</small>
+                        </div>
+                    </div>
+
+                    {% elif tool_id in ['unlock', 'protect'] %}
+                    <!-- Password Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Password:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="pdfPassword" name="password" value="{{ password or '' }}" 
+                                   placeholder="Enter {{ 'password to remove' if tool_id == 'unlock' else 'new password' }}">
+                            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="pdfPassword">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+						<div class="invalid-feedback" id="passwordFeedback" style="display:none;">
+							{% if tool_id == 'unlock' %}
+							Password must be entered to unlock the PDF.
+							{% else %}
+							Password must be at least 4 characters long.
+							{% endif %}
+						</div>
+                    </div>
+                    {% if tool_id == 'protect' %}
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Confirm password">
+                            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="confirmPassword">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+						<div class="invalid-feedback" id="confirmPasswordFeedback" style="display:none;">
+							Passwords do not match.
+						</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Permissions:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="allowPrinting" name="allow_printing" checked>
+                            <label class="form-check-label" for="allowPrinting">Allow printing</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="allowModification" name="allow_modification">
+                            <label class="form-check-label" for="allowModification">Allow modification</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="allowCopying" name="allow_copying">
+                            <label class="form-check-label" for="allowCopying">Allow copying</label>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% elif tool_id == 'ocr' %}
+                    <!-- OCR Options -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">OCR Language:</label>
+                        <select class="form-select" id="ocrLanguage" name="ocr_language">
+                            <option value="eng" selected>English</option>
+                            <option value="spa">Spanish</option>
+                            <option value="fra">French</option>
+                            <option value="deu">German</option>
+                            <option value="ita">Italian</option>
+                            <option value="por">Portuguese</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Output Format:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ocrOutput" id="ocrSearchable" value="searchable" checked>
+                            <label class="form-check-label" for="ocrSearchable">Searchable PDF</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ocrOutput" id="ocrText" value="text">
+                            <label class="form-check-label" for="ocrText">Extracted Text</label>
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <!-- Default Options for other tools -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Output Format:</label>
+                        {% if tool_id == 'pdf-to-word' %}
+                        <select class="form-select" id="wordFormat" name="word_format">
+                            <option value="docx" selected>DOCX (Word Document)</option>
+                            <option value="doc">DOC (Word 97-2003)</option>
+                        </select>
+                        {% elif tool_id == 'pdf-to-excel' %}
+                        <select class="form-select" id="excelFormat" name="excel_format">
+                            <option value="xlsx" selected>XLSX (Excel Workbook)</option>
+                            <option value="xls">XLS (Excel 97-2003)</option>
+                            <option value="csv">CSV (Comma Separated Values)</option>
+                        </select>
+                        {% elif tool_id == 'pdf-to-ppt' %}
+                        <select class="form-select" id="pptFormat" name="ppt_format">
+                            <option value="pptx" selected>PPTX (PowerPoint Presentation)</option>
+                            <option value="ppt">PPT (PowerPoint 97-2003)</option>
+                        </select>
+                        {% elif tool_id == 'pdf-to-jpg' %}
+                        <select class="form-select" id="imageFormat" name="image_format">
+                            <option value="jpg" selected>JPG</option>
+                            <option value="png">PNG</option>
+                            <option value="tiff">TIFF</option>
+                        </select>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Selection Summary -->
+                <div class="selection-summary mb-4">
+                    <h6 class="fw-bold border-bottom pb-2 mb-3">Selection Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Files:</span>
+                        <span id="fileCount">{{ files|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Pages:</span>
+                        <span id="totalPageCount">
+                            {% set total_pages = files|sum(attribute='page_count') %}
+                            {{ total_pages }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Selected Pages:</span>
+                        <span id="selectedPageCount">{{ total_pages }}</span>
+                    </div>
+                </div>
+                
+                <!-- Process Button Section -->
+                <div class="process-section">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" id="processBtn">
+                            <span class="process-animation" style="display: none;">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            </span>
+                            <i class="bi bi-gear-fill me-2"></i>Process {{ tool_name }}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="backBtn">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Overlay -->
+<div id="processingOverlay">
+    <div class="processing-popup">
+        <div class="spinner"></div>
+        <h4>Processing...</h4>
+        <p>Please wait while we process your files.</p>
+        <div class="progress mt-3" style="width: 300px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="confirmation-modal" id="confirmationModal">
+    <div class="confirmation-content">
+        <h5>Confirm Action</h5>
+        <p>Are you sure you want to remove this file from the process?</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="button" class="btn btn-secondary" id="cancelRemoveBtn">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Remove</button>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Container -->
+<div class="alert-container">
+    <div class="alert alert-success alert-dismissible fade" role="alert" id="successAlert">
+        <div><i class="bi bi-check-circle-fill me-2"></i> <strong>Success!</strong> Your files have been processed.</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade" role="alert" id="errorAlert">
+        <div><i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Error!</strong> Something went wrong.</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    // Global variables
+    let fileToRemove = null;
+    let selectedPages = {};
+    let isProcessing = false;
+    
+    // Initialize selectedPages object
+    {% for file in files %}
+    selectedPages["{{ file.name }}"] = Array.from({length: {{ file.page_count }}}, (_, i) => i + 1);
+    {% endfor %}
+    
+    // Initialize Sortable for file reordering (for merge tool)
+    {% if tool_id == 'merge' %}
+    const fileOrderList = document.getElementById('fileOrderList');
+    if (fileOrderList) {
+        new Sortable(fileOrderList, {
+            animation: 150,
+            ghostClass: 'drag-over',
+            chosenClass: 'dragging',
+            dragClass: 'dragging',
+            onEnd: function(evt) {
+                updateFileOrder();
+            }
+        });
+    }
+    {% endif %}
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Disable page selection for unlock and protect tools
+        const toolId = document.getElementById('previewContent').getAttribute('data-tool-id');
+        if (toolId === 'unlock' || toolId === 'protect') {
+            const previewOptions = document.querySelectorAll('input[name="previewOption"]');
+            previewOptions.forEach(option => {
+                option.disabled = true;
+                // Also disable their labels to visually indicate they are disabled
+                const label = document.querySelector(`label[for="${option.id}"]`);
+                if (label) label.style.opacity = '0.6';
+            });
+            
+            const selectionButtons = document.querySelectorAll('#selectAllBtn, #selectNoneBtn');
+            selectionButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('disabled'); // Add disabled class for styling
+            });
+        }
+        
+        // Initialize tool-specific UI components
+        initializeToolOptions();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Update the selection summary
+        updateSelectionSummary();
+        
+        // Set up drag and drop for merge tool
+        {% if tool_id == 'merge' %}
+        setupDragAndDrop();
+        {% endif %}
+        
+        // Initialize preview options
+        initializePreviewOptions();
+    });
+    
+    // Initialize tool-specific UI components
+    function initializeToolOptions() {
+        // Split tool options
+        const splitAll = document.getElementById('splitAll');
+        const splitRange = document.getElementById('splitRange');
+        const rangeInput = document.getElementById('rangeInput');
+        
+        if (splitAll && splitRange && rangeInput) {
+            splitAll.addEventListener('change', function() {
+                rangeInput.style.display = this.checked ? 'none' : 'block';
+            });
+            
+            splitRange.addEventListener('change', function() {
+                rangeInput.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+        
+        // Compression quality slider
+        const qualitySlider = document.getElementById('compressionQuality');
+        const qualityValue = document.getElementById('qualityValue');
+        
+        if (qualitySlider && qualityValue) {
+            qualitySlider.addEventListener('input', function() {
+                qualityValue.textContent = this.value;
+            });
+        }
+        
+        // Toggle password visibility
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    targetInput.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
+            });
+        });
+
+        // Password validation for unlock/protect tools
+        const toolId = document.getElementById('previewContent').getAttribute('data-tool-id');
+        const passwordInput = document.getElementById('pdfPassword');
+        const passwordFeedback = document.getElementById('passwordFeedback');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const confirmPasswordFeedback = document.getElementById('confirmPasswordFeedback');
+
+        if (toolId === 'unlock' || toolId === 'protect') {
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    passwordInput.classList.remove('is-invalid');
+                    passwordFeedback.style.display = 'none';
+                    if (toolId === 'protect' && confirmPasswordInput) {
+                        // Re-validate confirm password if password changes
+                        validateConfirmPassword();
+                    }
+                });
+            }
+
+            if (toolId === 'protect' && confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+            }
+        }
+
+        function validateConfirmPassword() {
+            if (passwordInput.value.length >= 4 && confirmPasswordInput.value !== passwordInput.value) {
+                confirmPasswordInput.classList.add('is-invalid');
+                confirmPasswordFeedback.style.display = 'block';
+            } else {
+                confirmPasswordInput.classList.remove('is-invalid');
+                confirmPasswordFeedback.style.display = 'none';
+            }
+        }
+    }
+    
+    // Set up event listeners
+    function setupEventListeners() {
+        // Page selection checkboxes
+        const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+        pageCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const filename = this.getAttribute('data-filename');
+                const pageIndex = parseInt(this.getAttribute('data-page-index')) + 1;
+                
+                if (this.checked) {
+                    // Add page to selection
+                    if (!selectedPages[filename].includes(pageIndex)) {
+                        selectedPages[filename].push(pageIndex);
+                        selectedPages[filename].sort((a, b) => a - b);
+                    }
+                } else {
+                    // Remove page from selection
+                    const index = selectedPages[filename].indexOf(pageIndex);
+                    if (index > -1) {
+                        selectedPages[filename].splice(index, 1);
+                    }
+                }
+                
+                // Update the hidden input field
+                document.getElementById(`selected_pages_${filename.replace(/ /g, '_')}`).value = selectedPages[filename].join(',');
+                
+                // Update selection summary
+                updateSelectionSummary();
+            });
+        });
+
+        // Clickable page images
+        const previewPages = document.querySelectorAll('.preview-page');
+        previewPages.forEach(page => {
+            page.addEventListener('click', function() {
+                const filename = this.getAttribute('data-filename');
+                const pageIndex = parseInt(this.getAttribute('data-page-index'));
+                const checkbox = document.getElementById(`page_${filename.replace(/ /g, '_')}_${pageIndex}`);
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change')); // Trigger change event
+                }
+            });
+        });
+        
+        // Select all/none buttons
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', selectAllPages);
+        }
+        const selectNoneBtn = document.getElementById('selectNoneBtn');
+        if (selectNoneBtn) {
+            selectNoneBtn.addEventListener('click', selectNoPages);
+        }
+        
+        // Process button
+        document.getElementById('processBtn').addEventListener('click', processFiles);
+        
+        // Back button
+        document.getElementById('backBtn').addEventListener('click', function() {
+            if (!isProcessing) {
+                const toolId = document.getElementById('previewContent').getAttribute('data-tool-id');
+                window.location.href = `/tool/${toolId}`; 
+            }
+        });
+        
+        // Remove file buttons
+        const removeFileBtns = document.querySelectorAll('.remove-file-btn');
+        removeFileBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!isProcessing) {
+                    const fileIndex = this.getAttribute('data-file-index');
+                    showRemoveConfirmation(fileIndex);
+                }
+            });
+        });
+        
+        // Confirmation modal buttons
+        document.getElementById('cancelRemoveBtn').addEventListener('click', hideRemoveConfirmation);
+        document.getElementById('confirmRemoveBtn').addEventListener('click', removeFile);
+        
+        // Preview option radio buttons
+        const previewOptions = document.querySelectorAll('input[name="previewOption"]');
+        previewOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                if (!isProcessing) {
+                    updatePreviewDisplay(this.value);
+                }
+            });
+        });
+    }
+    
+    // Set up drag and drop for merge tool
+    function setupDragAndDrop() {
+        const fileOrderItems = document.querySelectorAll('.file-order-item');
+        let dragImage = null;
+        
+        fileOrderItems.forEach(item => {
+            // Set up drag start
+            item.addEventListener('dragstart', function(e) {
+                if (isProcessing) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                this.classList.add('dragging');
+                
+                // Create a custom drag image
+                dragImage = document.createElement('div');
+                dragImage.className = 'drag-image';
+                dragImage.textContent = this.querySelector('.text-truncate').textContent;
+                document.body.appendChild(dragImage);
+                
+                e.dataTransfer.setDragImage(dragImage, 0, 0);
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.getAttribute('data-filename'));
+            });
+            
+            // Set up drag end
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                if (dragImage) {
+                    document.body.removeChild(dragImage);
+                    dragImage = null;
+                }
+            });
+            
+            // Set up drag over
+            item.addEventListener('dragover', function(e) {
+                if (isProcessing) {
+                    e.preventDefault();
+                    return;
+                }
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            
+            // Set up drag leave
+            item.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            // Set up drop
+            item.addEventListener('drop', function(e) {
+                if (isProcessing) {
+                    e.preventDefault();
+                    return;
+                }
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                const draggedFilename = e.dataTransfer.getData('text/plain');
+                const targetFilename = this.getAttribute('data-filename');
+                
+                if (draggedFilename !== targetFilename) {
+                    // Reorder the files
+                    reorderFiles(draggedFilename, targetFilename);
+                }
+            });
+        });
+    }
+    
+    // Reorder files in the merge tool
+    function reorderFiles(draggedFilename, targetFilename) {
+        const fileOrderList = document.getElementById('fileOrderList');
+        const items = Array.from(fileOrderList.querySelectorAll('.file-order-item'));
+        
+        // Find the indices of the dragged and target files
+        const draggedIndex = items.findIndex(item => item.getAttribute('data-filename') === draggedFilename);
+        const targetIndex = items.findIndex(item => item.getAttribute('data-filename') === targetFilename);
+        
+        if (draggedIndex !== -1 && targetIndex !== -1) {
+            // Reorder the items in the DOM
+            const draggedItem = items[draggedIndex];
+            const targetItem = items[targetIndex];
+
+            if (draggedIndex < targetIndex) {
+                fileOrderList.insertBefore(draggedItem, targetItem.nextSibling);
+            } else {
+                fileOrderList.insertBefore(draggedItem, targetItem);
+            }
+            
+            // Update the file order
+            updateFileOrder();
+        }
+    }
+    
+    // Update the file order for the merge tool
+    function updateFileOrder() {
+        const fileOrderList = document.getElementById('fileOrderList');
+        const items = fileOrderList.querySelectorAll('.file-order-item');
+        const fileOrder = Array.from(items).map(item => item.getAttribute('data-filename'));
+        
+        // You can use this fileOrder array when submitting the form
+        console.log('New file order:', fileOrder);
+    }
+    
+    // Initialize preview options
+    function initializePreviewOptions() {
+        // Set initial preview display based on selected option
+        const selectedOptionInput = document.querySelector('input[name="previewOption"]:checked');
+        if (selectedOptionInput) {
+            updatePreviewDisplay(selectedOptionInput.value);
+        }
+    }
+    
+    // Update preview display based on selected option
+    function updatePreviewDisplay(option) {
+        if (option === 'all') {
+            // Show all pages
+            document.querySelectorAll('.preview-item').forEach(item => {
+                item.style.display = 'block';
+            });
+        } else if (option === 'range') {
+            // Show only first and last page of each file
+            document.querySelectorAll('.file-preview-section').forEach(section => {
+                const filename = section.getAttribute('data-filename');
+                const previewItems = section.querySelectorAll('.preview-item');
+                
+                if (previewItems.length > 0) {
+                    // Hide all items first
+                    previewItems.forEach(item => {
+                        item.style.display = 'none';
+                    });
+                    
+                    // Show first page
+                    if (previewItems[0]) {
+                        previewItems[0].style.display = 'block';
+                    }
+                    
+                    // Show last page if there's more than one page
+                    if (previewItems.length > 1 && previewItems[previewItems.length - 1]) {
+                        previewItems[previewItems.length - 1].style.display = 'block';
+                    }
+                }
+            });
+        }
+    }
+    
+    // Select all pages
+    function selectAllPages() {
+        if (isProcessing) return;
+        
+        const checkboxes = document.querySelectorAll('.page-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+            
+            const filename = checkbox.getAttribute('data-filename');
+            const pageIndex = parseInt(checkbox.getAttribute('data-page-index')) + 1;
+            
+            if (!selectedPages[filename].includes(pageIndex)) {
+                selectedPages[filename].push(pageIndex);
+            }
+        });
+        
+        // Update hidden inputs and summary
+        updateSelectedPagesInputs();
+        updateSelectionSummary();
+    }
+    
+    // Select no pages
+    function selectNoPages() {
+        if (isProcessing) return;
+        
+        const checkboxes = document.querySelectorAll('.page-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+            
+            const filename = checkbox.getAttribute('data-filename');
+            const pageIndex = parseInt(checkbox.getAttribute('data-page-index')) + 1;
+            
+            const index = selectedPages[filename].indexOf(pageIndex);
+            if (index > -1) {
+                selectedPages[filename].splice(index, 1);
+            }
+        });
+        
+        // Update hidden inputs and summary
+        updateSelectedPagesInputs();
+        updateSelectionSummary();
+    }
+    
+    // Update hidden inputs with selected pages
+    function updateSelectedPagesInputs() {
+        for (const filename in selectedPages) {
+            if (selectedPages.hasOwnProperty(filename)) {
+                const inputId = `selected_pages_${filename.replace(/ /g, '_')}`;
+                const inputElement = document.getElementById(inputId);
+                
+                if (inputElement) {
+                    selectedPages[filename].sort((a, b) => a - b); // Ensure pages are sorted
+                    inputElement.value = selectedPages[filename].join(',');
+                }
+            }
+        }
+    }
+    
+    // Update selection summary
+    function updateSelectionSummary() {
+        let selectedCount = 0;
+        
+        for (const filename in selectedPages) {
+            if (selectedPages.hasOwnProperty(filename)) {
+                selectedCount += selectedPages[filename].length;
+            }
+        }
+        
+        document.getElementById('selectedPageCount').textContent = selectedCount;
+    }
+    
+    // Show remove confirmation modal
+    function showRemoveConfirmation(fileIndex) {
+        fileToRemove = fileIndex;
+        document.getElementById('confirmationModal').style.display = 'flex';
+    }
+    
+    // Hide remove confirmation modal
+    function hideRemoveConfirmation() {
+        fileToRemove = null;
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
+    
+    // Remove file from the process
+    function removeFile() {
+        if (fileToRemove !== null) {
+            // Find the file item in the sidebar
+            const fileItem = document.querySelector(`.file-item[data-file-index="${fileToRemove}"]`);
+            
+            if (fileItem) {
+                const filename = fileItem.getAttribute('data-filename');
+                
+                // Remove from selectedPages object
+                delete selectedPages[filename];
+                
+                // Remove the file item from the sidebar
+                fileItem.remove();
+                
+                // Remove the preview section
+                const previewSection = document.getElementById(`preview-section-${fileToRemove}`);
+                if (previewSection) {
+                    previewSection.remove();
+                }
+
+                // Re-index remaining file items and update data-file-index attributes
+                document.querySelectorAll('.file-item').forEach((item, newIndex) => {
+                    item.setAttribute('data-file-index', newIndex);
+                    const removeBtn = item.querySelector('.remove-file-btn');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('data-file-index', newIndex);
+                    }
+                });
+                
+                // Update file count
+                const fileCount = document.querySelectorAll('.file-item').length;
+                document.getElementById('fileCount').textContent = fileCount;
+                
+                // Update selection summary
+                updateSelectionSummary();
+                
+                // If no files left, show message
+                if (fileCount === 0) {
+                    showNoFilesMessage();
+                }
+            }
+            
+            // Hide the confirmation modal
+            hideRemoveConfirmation();
+        }
+    }
+    
+    // Show no files message
+    function showNoFilesMessage() {
+        const previewContent = document.getElementById('previewContent');
+        let noFilesMessage = document.querySelector('.no-files-message');
+        if (!noFilesMessage) {
+            noFilesMessage = document.createElement('div');
+            noFilesMessage.className = 'no-files-message';
+            noFilesMessage.innerHTML = `
+                <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+                <h5 class="text-muted">No Files Selected</h5>
+                <p class="text-muted">Go back to upload files for processing.</p>
+                <button class="btn btn-primary mt-2" id="goBackBtn">Go Back</button>
+            `;
+            previewContent.appendChild(noFilesMessage);
+        }
+        noFilesMessage.style.display = 'block'; // Ensure it's visible
+
+        // Add event listener to the button
+        setTimeout(() => {
+            const goBackBtn = document.getElementById('goBackBtn');
+            if (goBackBtn) {
+                goBackBtn.addEventListener('click', function() {
+                    window.location.href = '/'; // Redirect to home/upload page
+                });
+            }
+        }, 100);
+    }
+    
+    // Process files
+    function processFiles() {
+        if (isProcessing) return;
+        
+        // Validate password fields for unlock/protect tools
+        const toolId = document.getElementById('previewContent').getAttribute('data-tool-id');
+        let isValid = true;
+        
+        if (toolId === 'unlock' || toolId === 'protect') {
+            const passwordInput = document.getElementById('pdfPassword');
+            const passwordFeedback = document.getElementById('passwordFeedback');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const confirmPasswordFeedback = document.getElementById('confirmPasswordFeedback');
+
+            // Reset validation states
+            passwordInput.classList.remove('is-invalid');
+            passwordFeedback.style.display = 'none';
+            if (confirmPasswordInput) {
+                confirmPasswordInput.classList.remove('is-invalid');
+                confirmPasswordFeedback.style.display = 'none';
+            }
+
+            if (!passwordInput.value.trim()) {
+                passwordInput.classList.add('is-invalid');
+                passwordFeedback.textContent = "Password must be entered to unlock the PDF.";
+                passwordFeedback.style.display = 'block';
+                isValid = false;
+            } else if (toolId === 'protect') {
+                if (passwordInput.value.length < 4) {
+                    passwordInput.classList.add('is-invalid');
+                    passwordFeedback.textContent = "Password must be at least 4 characters long.";
+                    passwordFeedback.style.display = 'block';
+                    isValid = false;
+                } else if (confirmPasswordInput && passwordInput.value !== confirmPasswordInput.value) {
+                    confirmPasswordInput.classList.add('is-invalid');
+                    confirmPasswordFeedback.style.display = 'block';
+                    isValid = false;
+                }
+            }
+        }
+        
+        if (!isValid) {
+            return;
+        }
+        
+        // Set processing state
+        isProcessing = true;
+        
+        // Show processing animation on button
+        const processBtn = document.getElementById('processBtn');
+        const processAnimation = processBtn.querySelector('.process-animation');
+        processAnimation.style.display = 'inline-block';
+        processBtn.disabled = true; // Disable the process button itself
+        
+        // Disable all other interactive elements
+        document.querySelectorAll('button:not(#processBtn), input, select').forEach(element => {
+            element.disabled = true;
+        });
+        
+        // Show processing overlay after a short delay
+        setTimeout(() => {
+            const overlay = document.getElementById('processingOverlay');
+            overlay.style.display = 'flex';
+            
+            // Animate progress bar
+            const progressBar = document.querySelector('.progress-bar');
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress <= 90) {
+                    progressBar.style.width = `${progress}%`;
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 500);
+            
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/tool/${toolId}/process`;
+            
+            // Add all the hidden inputs for selected pages
+            for (const filename in selectedPages) {
+                if (selectedPages.hasOwnProperty(filename)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = `selected_pages_${filename}`;
+                    input.value = selectedPages[filename].join(',');
+                    form.appendChild(input);
+                }
+            }
+            
+            // Add tool options
+            const toolOptions = getToolOptions(toolId);
+            for (const key in toolOptions) {
+                if (toolOptions.hasOwnProperty(key)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = toolOptions[key];
+                    form.appendChild(input);
+                }
+            }
+            
+            // Add file order for merge tool
+            if (toolId === 'merge') {
+                const fileOrder = getFileOrder();
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'file_order';
+                input.value = JSON.stringify(fileOrder);
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }, 1000);
+    }
+    
+    // Helper function to get tool options
+    function getToolOptions(toolId) {
+        const options = {};
+        
+        if (toolId === 'split') {
+            const splitOption = document.querySelector('input[name="splitOption"]:checked');
+            if (splitOption) options.split_option = splitOption.value;
+            
+            const pageRanges = document.getElementById('pageRanges');
+            if (pageRanges && pageRanges.value) options.page_ranges = pageRanges.value;
+        }
+        else if (toolId === 'rotate') {
+            const rotationAngle = document.getElementById('rotationAngle');
+            if (rotationAngle) options.rotation_angle = rotationAngle.value;
+            
+            const rotateOption = document.querySelector('input[name="rotateOption"]:checked');
+            if (rotateOption) options.rotate_option = rotateOption.value;
+        }
+        else if (toolId === 'compress') {
+            const compressionLevel = document.getElementById('compressionLevel');
+            if (compressionLevel) options.compression_level = compressionLevel.value;
+            
+            const compressionQuality = document.getElementById('compressionQuality');
+            if (compressionQuality) options.compression_quality = compressionQuality.value;
+        }
+        else if (toolId === 'unlock' || toolId === 'protect') {
+            const passwordInput = document.getElementById('pdfPassword');
+            if (passwordInput) options.password = passwordInput.value;
+            
+            if (toolId === 'protect') {
+                const allowPrinting = document.getElementById('allowPrinting');
+                if (allowPrinting) options.allow_printing = allowPrinting.checked;
+                
+                const allowModification = document.getElementById('allowModification');
+                if (allowModification) options.allow_modification = allowModification.checked;
+                
+                const allowCopying = document.getElementById('allowCopying');
+                if (allowCopying) options.allow_copying = allowCopying.checked;
+            }
+        }
+        else if (toolId === 'pdf-to-word') {
+            const wordFormat = document.getElementById('wordFormat');
+            if (wordFormat) options.word_format = wordFormat.value;
+        }
+        else if (toolId === 'pdf-to-excel') {
+            const excelFormat = document.getElementById('excelFormat');
+            if (excelFormat) options.excel_format = excelFormat.value;
+        }
+        else if (toolId === 'pdf-to-ppt') {
+            const pptFormat = document.getElementById('pptFormat');
+            if (pptFormat) options.ppt_format = pptFormat.value;
+        }
+        else if (toolId === 'pdf-to-jpg') {
+            const imageFormat = document.getElementById('imageFormat');
+            if (imageFormat) options.image_format = imageFormat.value;
+        }
+        else if (toolId === 'ocr') {
+            const ocrLanguage = document.getElementById('ocrLanguage');
+            if (ocrLanguage) options.ocr_language = ocrLanguage.value;
+            
+            const ocrOutput = document.querySelector('input[name="ocrOutput"]:checked');
+            if (ocrOutput) options.ocr_output = ocrOutput.value;
+        }
+        
+        return options;
+    }
+    
+    // Helper function to get file order for merge tool
+    function getFileOrder() {
+        const fileOrderItems = document.querySelectorAll('.file-order-item');
+        return Array.from(fileOrderItems).map(item => item.getAttribute('data-filename'));
+    }
+    
+    // Show success alert
+    function showSuccessAlert(message) {
+        const alert = document.getElementById('successAlert');
+        const alertMessage = alert.querySelector('div');
+        
+        // Update the message if provided
+        if (message) {
+            alertMessage.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i> <strong>Success!</strong> ${message}`;
+        }
+        
+        // Show the alert
+        alert.classList.add('show');
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+    
+    // Show error alert
+    function showErrorAlert(message) {
+        const alert = document.getElementById('errorAlert');
+        const alertMessage = alert.querySelector('div');
+        
+        // Update the message if provided
+        if (message) {
+            alertMessage.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Error!</strong> ${message}`;
+        }
+        
+        // Show the alert
+        alert.classList.add('show');
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+</script>
+{% endblock %}

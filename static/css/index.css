@@ -1,0 +1,409 @@
+/* ---------------- Root Colors ---------------- */
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --info: #0dcaf0;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --secondary: #6c757d;
+
+    /* Tool-specific colors */
+    --split-color: #ff6f61;
+    --merge-color: #f50057;
+    --rotate-color: #00c853;
+    --compress-color: #ff9800;
+    --pdf-to-word-color: #2b579a;
+    --pdf-to-excel-color: #217346;
+    --pdf-to-ppt-color: #d24726;
+    --pdf-to-jpg-color: #43a047;
+    --pdf-to-text-color: #6a1b9a;
+    --ocr-color: #00acc1;
+    --unlock-pdf-color: #f57c00;
+    --protect-pdf-color: #c62828;
+}
+
+/* ---------------- Body & Typography ---------------- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fc;
+}
+
+/* ---------------- Navbar ---------------- */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-nav .nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    margin: 0 0.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:not(.active):hover {
+    background-color: rgba(13,110,253,0.1);
+    transform: translateY(-2px);
+}
+
+.navbar-nav .nav-link.active {
+    background-color: var(--primary);
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(13,110,253,0.3);
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background-color: var(--primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 3px;
+}
+
+.navbar-nav .nav-link:hover::after { 
+    width: 70%; 
+}
+
+.navbar-nav .nav-link.active::after { 
+    width: 90%; 
+    background-color: white; 
+}
+
+/* ---------------- Hero Section ---------------- */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #0043a6 100%) !important;
+}
+
+.hero-section { 
+    position: relative; 
+    overflow: hidden; 
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: rgba(255,255,255,0.1);
+    transform: rotate(30deg);
+}
+
+.hero-graphic {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    padding: 2rem;
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-pdf,
+.floating-word,
+.floating-excel,
+.floating-image,
+.server-icon,
+.api-icon,
+.cloud-icon,
+.shield-icon {
+    position: absolute;
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-pdf {
+    animation-delay: 0s;
+    top: 20px;
+    left: 30px;
+}
+
+.floating-word {
+    animation-delay: 1s;
+    top: 80px;
+    right: 40px;
+}
+
+.floating-excel {
+    animation-delay: 2s;
+    bottom: 30px;
+    left: 40px;
+}
+
+.floating-image {
+    animation-delay: 3s;
+    bottom: 80px;
+    right: 30px;
+}
+
+.server-icon {
+    animation-delay: 0s;
+    top: 20px;
+    left: 30px;
+}
+
+.api-icon {
+    animation-delay: 1s;
+    top: 90px;
+    right: 40px;
+}
+
+.cloud-icon {
+    animation-delay: 2s;
+    bottom: 30px;
+    left: 40px;
+}
+
+.shield-icon {
+    animation-delay: 3s;
+    bottom: 80px;
+    right: 30px;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.main-icon,
+.main-building {
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.enterprise-graphic {
+    background-color: rgba(108, 117, 125, 0.25);
+    border-radius: 12px;
+    padding: 2rem;
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------- Tools Cards ---------------- */
+.tool-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    border: 1px solid black !important;
+}
+
+.tool-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1) !important;
+    border: 2px solid black !important;
+}
+
+.tool-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f8f9fc;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.tool-icon-wrapper:hover {
+    transform: scale(1.2);
+    border: 2px solid black;
+}
+
+/* Tool-specific colors */
+.tool-icon-split { background-color: rgba(255,111,97,0.15); color: var(--split-color); }
+.tool-icon-merge { background-color: rgba(245,0,87,0.15); color: var(--merge-color); }
+.tool-icon-rotate { background-color: rgba(0,200,83,0.15); color: var(--rotate-color); }
+.tool-icon-compress { background-color: rgba(255,152,0,0.15); color: var(--compress-color); }
+.tool-icon-pdf-to-word { background-color: rgba(43,87,154,0.15); color: var(--pdf-to-word-color); }
+.tool-icon-pdf-to-excel { background-color: rgba(33,115,70,0.15); color: var(--pdf-to-excel-color); }
+.tool-icon-pdf-to-ppt { background-color: rgba(210,71,38,0.15); color: var(--pdf-to-ppt-color); }
+.tool-icon-pdf-to-jpg { background-color: rgba(67,160,71,0.15); color: var(--pdf-to-jpg-color); }
+.tool-icon-pdf-to-text { background-color: rgba(106,27,154,0.15); color: var(--pdf-to-text-color); }
+.tool-icon-ocr { background-color: rgba(0,172,193,0.15); color: var(--ocr-color); }
+.tool-icon-unlock-pdf { background-color: rgba(245,124,0,0.15); color: var(--unlock-pdf-color); }
+.tool-icon-protect-pdf { background-color: rgba(198,40,40,0.15); color: var(--protect-pdf-color); }
+
+/* ---------------- Buttons ---------------- */
+.btn { 
+    border-radius: 8px; 
+    font-weight: 500; 
+    transition: all 0.3s ease;
+}
+
+.btn-rounded { 
+    border-radius: 50px; 
+}
+
+.btn-outline-primary:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(13,110,253,0.3); 
+}
+
+.btn-primary:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 12px rgba(13,110,253,0.4); 
+}
+
+/* ---------------- Features Section ---------------- */
+.features-section {
+    background-color: #f8f9fc;
+}
+
+.feature-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: default;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.feature-card .feature-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f8f9fc;
+    margin: 0 auto 1rem;
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon-wrapper {
+    transform: scale(1.2);
+}
+
+.feature-card h5 { 
+    font-weight: 600; 
+    margin-bottom: 0.5rem; 
+}
+
+.feature-card p { 
+    font-size: 0.95rem; 
+    color: #6c757d; 
+}
+
+/* Feature Icon Colors */
+.feature-icon-security { 
+    background-color: rgba(220,53,69,0.1) !important;
+    color: #dc3545; 
+}
+
+.feature-icon-speed { 
+    background-color: rgba(255,193,7,0.1) !important;
+    color: #ffc107; 
+}
+
+.feature-icon-batch { 
+    background-color: rgba(25,135,84,0.1) !important;
+    color: #198754; 
+}
+
+/* ---------------- Enterprise Section ---------------- */
+#enterprise {
+    background-color: #1a1d20;
+}
+
+/* ---------------- Footer ---------------- */
+.footer { 
+    background-color: #fff; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+}
+
+.footer a.text-muted { 
+    transition: all 0.3s ease; 
+}
+
+.footer a.text-muted:hover { 
+    color: var(--primary) !important; 
+    transform: translateY(-2px); 
+}
+
+.footer .fa-lg { 
+    transition: all 0.3s ease; 
+}
+
+/* ---------------- Misc ---------------- */
+.icon-clickable { 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+
+.icon-clickable:hover { 
+    transform: scale(1.1); 
+}
+
+.clickable-card { 
+    cursor: pointer; 
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+    .display-4 { 
+        font-size: 2.5rem; 
+    }
+    
+    .hero-graphic, .enterprise-graphic { 
+        min-height: 200px; 
+        margin-top: 2rem; 
+    }
+    
+    .hero-graphic i, .enterprise-graphic i { 
+        font-size: 2.5rem !important; 
+    }
+    
+    .floating-pdf, .floating-word, .floating-excel, .floating-image,
+    .server-icon, .api-icon, .cloud-icon, .shield-icon { 
+        font-size: 2rem !important; 
+    }
+    
+    .navbar-nav .nav-link { 
+        margin: 0.2rem 0; 
+    }
+    
+    .main-icon, .main-building {
+        font-size: 3.5rem;
+    }
+}
+
+/* Search input styling */
+.input-group-text {
+    border-top-left-radius: 50px !important;
+    border-bottom-left-radius: 50px !important;
+}
+
+.form-control {
+    border-top-right-radius: 50px !important;
+    border-bottom-right-radius: 50px !important;
+}
+
+#searchButton {
+    border-radius: 50px;
+}

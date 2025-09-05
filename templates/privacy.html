@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy | PDFMaster Pro{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <h1 class="fw-bold mb-4">
+      <i class="fa-solid fa-user-shield me-2 text-primary"></i> Privacy Policy
+    </h1>
+
+    <p class="text-muted">
+      At <strong>PDFMaster Pro</strong>, your privacy is extremely important to us. This policy outlines what data we collect, how we use it, and how we keep it secure.
+    </p>
+
+    <hr class="my-4">
+
+    <h4 class="fw-bold mt-4">1. Information We Collect</h4>
+    <p class="text-muted">
+      We do not store your uploaded files permanently. Files are processed temporarily and automatically deleted from our servers within a short period of time.
+    </p>
+
+    <h4 class="fw-bold mt-4">2. How We Use Data</h4>
+    <p class="text-muted">
+      Uploaded files are only used for the requested operation (e.g., convert, merge, compress) and are never shared with third parties.
+    </p>
+
+    <h4 class="fw-bold mt-4">3. Data Security</h4>
+    <p class="text-muted">
+      All file transfers are encrypted using HTTPS. We use secure servers and continuously monitor for vulnerabilities to keep your data safe.
+    </p>
+
+    <h4 class="fw-bold mt-4">4. Cookies</h4>
+    <p class="text-muted">
+      We may use cookies to improve user experience, track analytics, and enhance site performance. You can disable cookies in your browser settings.
+    </p>
+
+    <h4 class="fw-bold mt-4">5. Third-Party Services</h4>
+    <p class="text-muted">
+      Our site may include links to third-party services (like ads or analytics). We are not responsible for the privacy practices of these services.
+    </p>
+
+    <h4 class="fw-bold mt-4">6. Updates to This Policy</h4>
+    <p class="text-muted">
+      This Privacy Policy may be updated from time to time. The “Last Updated” date will reflect the latest changes.
+    </p>
+
+    <h4 class="fw-bold mt-4">7. Contact Us</h4>
+    <p class="text-muted">
+      If you have any questions about this Privacy Policy, please <a href="/contact" class="text-decoration-none">contact us</a>.
+    </p>
+
+    <div class="mt-5 p-3 bg-white shadow-sm rounded text-center">
+      <small class="text-muted">Last Updated: {{ current_year if current_year else "2025" }}</small>
+    </div>
+  </div>
+</section>
+{% endblock %}
